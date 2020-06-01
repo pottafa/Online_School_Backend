@@ -1,0 +1,111 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/mdb.min.css" rel="stylesheet">
+
+    <title>Admin page</title>
+</head>
+<body>
+<div class="modal fade" id="modalEditForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold">Sign up</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mx-3">
+                <form id="edit-form">
+                    <div hidden="true" >
+                        <input type="text" id="modal-id" class="form-control validate">
+                    </div>
+                <div class="md-form mb-5">
+                    <i class="fas fa-user prefix grey-text"></i>
+                    <input type="text" id="modal-login" class="form-control validate">
+                    <label data-error="wrong" data-success="right" for="modal-login">Login</label>
+                </div>
+                <div class="md-form mb-5">
+                    <i class="fas fa-envelope prefix grey-text"></i>
+                    <input type="email" id="modal-email" class="form-control validate">
+                    <label data-error="wrong" data-success="right" for="modal-email">Email</label>
+                </div>
+
+                <div class="md-form mb-4">
+                    <i class="fas fa-lock prefix grey-text"></i>
+                    <input type="password" id="modal-pass" class="form-control validate">
+                    <label data-error="wrong" data-success="right" for="modal-pass">Password</label>
+                </div>
+                <div class="md-form mb-5">
+                    <input type="text" id="modal-name" class="form-control validate">
+                    <label data-error="wrong" data-success="right" for="modal-name">Name</label>
+                </div>
+                <div class="md-form mb-5">
+                    <input type="text" id="modal-age" class="form-control validate">
+                    <label data-error="wrong" data-success="right" for="modal-age">Age</label>
+                </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button onclick="editUserServer(this)" class="btn btn-deep-orange">Update</button>
+                <button class="btn btn-deep-orange">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<form name="users"  id="formuser" onsubmit="saveUser(event)">
+    <label>
+        login <br/>
+        <input type="text" name="login" placeholder="login" required>
+    </label>
+    <br/>
+    <label>
+        password<br/>
+        <input type="password"  name="password"  placeholder="password" required>
+    </label>
+    <br/>
+    <label>
+        name <br/>
+        <input type="text" name="name"  placeholder="name">
+    </label>
+    <br/>
+    <label>
+        age<br/>
+        <input type="number"  name="age"  placeholder="age" min="18" max="120" value="18">
+    </label><br/>
+
+    <div>
+        <button onclick="saveUser(event)" type="submit">Save</button>
+    </div>
+</form>
+
+<button  onclick="getAllUsers()">Show users</button>
+<br>
+    <table class="users"  >
+        <thead>
+            <th>id</th>
+            <th>login</th>
+            <th>password</th>
+            <th>name</th>
+            <th>age</th>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/popper.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/mdb.min.js"></script>
+<script type="text/javascript" src="js/userPanel.js"></script>
+</body>
+</html>

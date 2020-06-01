@@ -1,0 +1,47 @@
+﻿<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<style>
+.login {
+  margin: auto;
+  position: relative;
+  text-align: center;
+  top: 30%;
+  width: 30%;
+}
+input[type=text], input[type=password] {
+  width: 80%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+img {
+  width: 40%;
+  border-radius: 15%;
+  }
+</style>
+<head>
+    <title>Login</title>
+
+</head>
+<body>
+<div class="login">
+  <img src="images/login.png">
+    <br/>
+    <form th:action="@{/login}" method="post">
+        <label>
+            login <br/>
+            <input type="text" name="username" value="Admin">
+        </label>
+        <br/>
+        <label>
+            password<br/>
+            <input type="password" name="password" value="otus">
+        </label>
+        <br/><br/>
+        <input type="submit" value="Sign in">
+    </form>
+
+</div>
+</body>
+</html>
