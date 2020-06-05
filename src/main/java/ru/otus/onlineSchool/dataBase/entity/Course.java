@@ -1,5 +1,7 @@
 package ru.otus.onlineSchool.dataBase.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +15,8 @@ public class Course {
     private long id;
     @Column(name = "title")
     private String title;
+    @Column(name = "description")
+    private String description;
     @OneToMany(
             mappedBy = "course",
             cascade = CascadeType.ALL,
@@ -25,16 +29,26 @@ public class Course {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @JsonManagedReference
     private Set<Lesson> lessons = new HashSet<>();
 
-    public void addLesson(Lesson lesson) {
-        lessons.add(lesson);
+    public boolean addLesson(Lesson lesson) {
+        if (lessons.contains(lesson)) return false;
         lesson.setCourse(this);
+        return lessons.add(lesson);
     }
 
-    public void removeLesson(Lesson lesson) {
-        lessons.remove(lesson);
+    public boolean removeLesson(Lesson lesson) {
+        if (!lessons.contains(lesson)) return false;
         lesson.setCourse(null);
+        return lessons.remove(lesson);
+
+    }
+
+    public boolean updateLesson(Lesson lesson) {
+        if (!lessons.remove(lesson)) return false;
+        lesson.setCourse(this);
+        return lessons.add(lesson);
     }
 
     public void addGroup(Group group) {
@@ -81,5 +95,13 @@ public class Course {
 
     public void setLessons(Set<Lesson> lessons) {
         this.lessons = lessons;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

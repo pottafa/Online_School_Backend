@@ -12,8 +12,8 @@ public class Group implements Serializable {
     private Long id;
     @Column(name = "title")
     private String title;
-    @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY)
-    private List<User> students;
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<User> users;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Course course;
@@ -23,21 +23,21 @@ public class Group implements Serializable {
 
 
     public void addStudent(User student) {
-        students.add(student);
+        users.add(student);
         student.addToTheGroup(this);
     }
 
     public void removeStudent(User student) {
-        students.remove(student);
+        users.remove(student);
         student.removeFromTheGroup(this);
     }
 
-    public List<User> getStudents() {
-        return students;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setStudents(List<User> students) {
-        this.students = students;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     public Course getCourse() {

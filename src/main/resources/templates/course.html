@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/mdb.min.css" rel="stylesheet">
+    <title th:text="${course.title}">course</title>
+</head>
+<body>
+Title:<h2 th:text="${course.title}"> Title</h2>
+Description:<div th:text="${course.description}">
+</div>
+
+
+
+
+
+
+
+<h4>Add lesson</h4>
+
+<form name="lessons"  id="formlesson" onsubmit="saveLesson(event)">
+    <label>
+        Title <br/>
+        <input type="text" name="title" placeholder="title" required>
+    </label>
+    <br/>
+    <label>
+        Description<br/>
+        <input type="text"  name="description"  placeholder="description" required>
+    </label>
+    <div>
+        <button onclick="saveLesson(event)" type="submit">Save</button>
+    </div>
+</form>
+<br>
+<button  onclick="showLessons()">Show lessons</button>
+<br>
+<table class="lessons"  >
+    <thead>
+    <th>id</th>
+    <th>login</th>
+    <th>password</th>
+    <th>name</th>
+    <th>age</th>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script th:inline="javascript">
+    var course = [[${course}]];
+    var title = [[${course.title}]];
+</script>
+
+
+
+
+
+<div class="modal fade" id="modalLessonEditForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold">Sign up</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mx-3">
+                <form id="edit-form">
+                    <div hidden="true" >
+                        <input type="text" id="modal-id" class="form-control validate">
+                    </div>
+                    <div class="md-form mb-5">
+                        <input type="text" id="modal-title" class="form-control validate">
+                        <label data-error="wrong" data-success="right" for="modal-title">Title</label>
+                    </div>
+                    <div class="md-form mb-5">
+                        <label for="modal-description">Description</label>
+                        <textarea class="form-control" id="modal-description" rows="4"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button onclick="editLessonServer(this)" class="btn btn-deep-orange">Update</button>
+                <button class="btn btn-deep-orange">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/popper.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/js/mdb.min.js"></script>
+<script type="text/javascript" src="/js/course.js"></script>
+</body>
+</html>

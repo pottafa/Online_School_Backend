@@ -1,0 +1,85 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<style>
+.signup {
+  margin: auto;
+  position: relative;
+  text-align: center;
+  top: 30%;
+  width: 30%;
+}
+input[type=text], input[type=password] {
+  width: 80%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+img {
+  width: 40%;
+  border-radius: 15%;
+  }
+</style>
+<head>
+    <title>Sign up</title>
+
+</head>
+<body>
+<div class="signup">
+
+    <br/>
+    <form id="signup" >
+        <label>
+            login <br/>
+            <input type="text" name="login">
+        </label>
+        <br/>
+        <label>
+            password<br/>
+            <input type="password" name="password">
+        </label>
+        <br/>
+        <label>
+            name <br/>
+            <input type="text" name="name"  placeholder="name">
+        </label>
+        <br/>
+        <label>
+            age<br/>
+            <input type="number"  name="age"  placeholder="age" min="7" max="120" value="7">
+        </label><br/>
+        <br/>
+        <button onclick="saveUser(event)" type="submit">Sign up</button>
+    </form>
+</div>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script>
+    function saveUser(e) {
+ e.preventDefault();
+    var elements = document.getElementById("signup").elements;
+    var obj ={};
+    for(var i = 0 ; i < elements.length ; i++){
+        var item = elements.item(i);
+        obj[item.name] = item.value;
+    }
+
+  $.ajax({
+             type: "POST",
+             contentType: "application/json",
+             url: "/signup",
+             data: JSON.stringify(obj),
+             cache: false,
+             timeout: 600000,
+             success: function (id) {
+window.location.replace("/login");
+             },
+             error: function (e) {
+             alert("Registration error")
+                        }
+  });
+      return false;
+
+}
+</script>
+</body>
+</html>

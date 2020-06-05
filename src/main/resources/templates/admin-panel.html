@@ -1,6 +1,6 @@
 <!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
@@ -10,6 +10,46 @@
     <title>Admin page</title>
 </head>
 <body>
+
+<span> Welcome <span sec:authentication="name"></span>! </span>
+Roles: <span sec:authentication="principal.authorities"></span>
+
+<div sec:authorize="hasRole('ROLE_ADMIN')">
+    <h3>Create course</h3>
+    <br>
+<form name="course"  id="formCourse" onsubmit="createCourse(event)">
+    <label>
+        Title <br/>
+        <input type="text" name="title" placeholder="title" required>
+    </label>
+    <br/>
+    <label>
+        Description<br/>
+        <textarea name="description" rows="10" cols="30"></textarea>
+    </label>
+    <div>
+        <button onclick="createCourse(event)" type="submit">Save</button>
+    </div>
+</form>
+</div>
+
+<button  onclick="showCourses()">Show my courses</button>
+<br><br>
+<div>
+    <table class="courses"  >
+        <thead>
+        <th>Title</th>
+        <th>Number of groups</th>
+        <th>Description</th>
+        <th></th>
+        <th></th>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+<br><br>
+
 <div class="modal fade" id="modalEditForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -59,7 +99,8 @@
     </div>
 </div>
 
-
+<h3>Create user</h3>
+<br>
 <form name="users"  id="formuser" onsubmit="saveUser(event)">
     <label>
         login <br/>
@@ -72,6 +113,11 @@
     </label>
     <br/>
     <label>
+        email<br/>
+        <input type="email"  name="email"  placeholder="email" >
+    </label>
+    <br/>
+    <label>
         name <br/>
         <input type="text" name="name"  placeholder="name">
     </label>
@@ -81,13 +127,22 @@
         <input type="number"  name="age"  placeholder="age" min="18" max="120" value="18">
     </label><br/>
 
+    <label>
+        age<br/>
+        <select id="roles" name="role" onchange="getRole(this)" >
+            <option value="ROLE_USER">user</option>
+            <option value="ROLE_TEACHER">teacher</option>
+            <option value="ROLE_ADMIN">admin</option>
+        </select>
+    </label><br/>
+
     <div>
         <button onclick="saveUser(event)" type="submit">Save</button>
     </div>
 </form>
-
+<br><br>
 <button  onclick="getAllUsers()">Show users</button>
-<br>
+<br><br>
     <table class="users"  >
         <thead>
             <th>id</th>

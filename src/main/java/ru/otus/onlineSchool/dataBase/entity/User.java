@@ -1,54 +1,46 @@
 package ru.otus.onlineSchool.dataBase.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
 @Entity
 @Table(name = "users")
-public class User implements Serializable {
+public class User implements Serializable, UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
     private long id;
-    @Column(name = "name")
-    private String name;
-    @Column(name = "age")
-    private int age;
     @Column(name = "login")
     private String login;
     @Column(name = "password")
     private String password;
-    @Column(name = "email")
-    private String email;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "students_courses",
+    @JoinTable(name = "users_groups",
             joinColumns = {
-                    @JoinColumn(name = "student_id", referencedColumnName = "id",
+                    @JoinColumn(name = "user_id", referencedColumnName = "id",
                             nullable = false, updatable = false)},
             inverseJoinColumns = {
-                    @JoinColumn(name = "course_id", referencedColumnName = "id",
+                    @JoinColumn(name = "group_id", referencedColumnName = "id",
                             nullable = false, updatable = false)})
     private Set<Group> groups = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Role> roles;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private UserProfile profile;
+
     public User() {
-    }
-
-    public User(String login, String password) {
-        this.login = login;
-        this.password = password;
-    }
-
-    public User(String login, String password, String email, String name, int age) {
-        this.login = login;
-        this.password = password;
-        this.name = name;
-        this.age = age;
-        this.email = email;
     }
 
     public void addToTheGroup(Group group) {
@@ -57,14 +49,6 @@ public class User implements Serializable {
 
     public void removeFromTheGroup(Group group) {
         groups.remove(group);
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public void setId(long id) {
@@ -83,21 +67,67 @@ public class User implements Serializable {
         return login;
     }
 
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getRoles();
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public UserProfile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(UserProfile profile) {
+        if (profile == null) {
+            if (this.profile != null) {
+                this.profile.setUser(null);
+            }
+        } else {
+            profile.setUser(this);
+        }
+        this.profile = profile;
     }
 
     public long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getAge() {
-        return age;
-    }
 
     public void setLogin(String login) {
         this.login = login;
@@ -107,12 +137,5 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
 }
