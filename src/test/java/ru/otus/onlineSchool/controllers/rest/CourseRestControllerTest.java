@@ -1,6 +1,7 @@
 package ru.otus.onlineSchool.controllers.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -8,6 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Scope;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import ru.otus.onlineSchool.entity.Course;
@@ -25,11 +29,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc()
 class CourseRestControllerTest {
     @TestConfiguration
-    static class EmployeeServiceImplTestContextConfiguration {
+    static class CourseRestControllerTestContextConfiguration {
         @Bean
         @Primary
+        @Scope()
         public CourseRepository fakeWorkChartRepository() {
             return new FakeCourseRepository();
+        }
+
+        @Bean
+        @Primary
+        public PasswordEncoder bCryptPasswordEncoder() {
+            return new BCryptPasswordEncoder();
         }
     }
 
@@ -38,6 +49,14 @@ class CourseRestControllerTest {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private FakeCourseRepository fakeCourseRepository;
+
+    @BeforeEach
+    void setUp(){
+        fakeCourseRepository.reset();
+    }
 
     @Test
     void createCourseSuccess() throws Exception {

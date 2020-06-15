@@ -8,18 +8,22 @@ import java.util.Map;
 import java.util.Optional;
 
 public class FakeCourseRepository implements CourseRepository {
-    private final Map<Long, Course> COURSES;
+    private Map<Long, Course> courses;
 
     public FakeCourseRepository() {
-        COURSES = new HashMap<>();
-        COURSES.put(1L, new Course(1, "Course One"));
-        COURSES.put(2L, new Course(2, "Course Two"));
-        COURSES.put(3L, new Course(3, "Course Three"));
+        reset();
+    }
+
+    public void reset() {
+        courses = new HashMap<>();
+        courses.put(1L, new Course(1, "Course One"));
+        courses.put(2L, new Course(2, "Course Two"));
+        courses.put(3L, new Course(3, "Course Three"));
     }
 
     @Override
     public Optional<Course> findByTitle(String title) {
-        return COURSES.entrySet().stream()
+        return courses.entrySet().stream()
                 .filter(e -> e.getValue().getTitle().equals(title))
                 .map(e -> e.getValue())
                 .findFirst();
@@ -32,7 +36,7 @@ public class FakeCourseRepository implements CourseRepository {
 
     @Override
     public Course save(Course course) {
-        return COURSES.put(course.getId(), course);
+        return courses.put(course.getId(), course);
     }
 
     @Override
@@ -42,7 +46,7 @@ public class FakeCourseRepository implements CourseRepository {
 
     @Override
     public Optional<Course> findById(Long id) {
-        return Optional.ofNullable(COURSES.get(id));
+        return Optional.ofNullable(courses.get(id));
     }
 
     @Override
@@ -52,7 +56,7 @@ public class FakeCourseRepository implements CourseRepository {
 
     @Override
     public Iterable<Course> findAll() {
-        return COURSES.values();
+        return courses.values();
     }
 
     @Override
@@ -67,7 +71,7 @@ public class FakeCourseRepository implements CourseRepository {
 
     @Override
     public void deleteById(Long id) {
-        COURSES.remove(id);
+        courses.remove(id);
     }
 
     @Override
