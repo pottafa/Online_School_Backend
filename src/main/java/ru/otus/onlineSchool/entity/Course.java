@@ -1,4 +1,4 @@
-package ru.otus.onlineSchool.dataBase.entity;
+package ru.otus.onlineSchool.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -13,10 +13,13 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
-    @Column(name = "title")
+
+    @Column(name = "title", unique = true)
     private String title;
+
     @Column(name = "description")
     private String description;
+
     @OneToMany(
             mappedBy = "course",
             cascade = CascadeType.ALL,
@@ -29,6 +32,7 @@ public class Course {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+
     @JsonManagedReference
     private Set<Lesson> lessons = new HashSet<>();
 
@@ -63,6 +67,11 @@ public class Course {
 
 
     public Course() {
+    }
+
+    public Course(long id, String title){
+        this.id = id;
+        this.title = title;
     }
 
     public long getId() {

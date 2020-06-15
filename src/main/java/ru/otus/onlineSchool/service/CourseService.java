@@ -1,11 +1,11 @@
-package ru.otus.onlineSchool.dataBase.service;
+package ru.otus.onlineSchool.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.otus.onlineSchool.dataBase.entity.Course;
-import ru.otus.onlineSchool.dataBase.repository.CourseRepository;
+import ru.otus.onlineSchool.entity.Course;
+import ru.otus.onlineSchool.repository.CourseRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Service
 public class CourseService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseService.class);
     @Autowired
     private CourseRepository courseRepository;
 
@@ -23,10 +23,10 @@ public class CourseService {
             LOGGER.error("Course already exist");
             return false;
         }
-        try{
-           Long id = courseRepository.save(course).getId();
+        try {
+            Long id = courseRepository.save(course).getId();
             LOGGER.info("Course with id {} was successfully created", id);
-        }catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("Course was not created", e);
         }
         return true;
@@ -43,22 +43,28 @@ public class CourseService {
         return course.orElse(null);
     }
 
-    public void deleteCourse(String title) {
-        try{
-      courseRepository.deleteByTitle(title);
+    public Course findCourseById(long id) {
+        Optional<Course> course = courseRepository.findById(id);
+        return course.orElse(null);
+    }
 
-            LOGGER.info("Course with title {} was successfully deleted", title);
-        }catch (Exception e) {
-            LOGGER.error("Course with title {} was not deleted",title, e);
+    //Было так -- public void deleteCourse(String title) {
+    // удалять по title совсем плохо, надо по id
+    public void deleteCourse(Long id) {
+        try {
+            courseRepository.deleteById(id);
+            LOGGER.info("Course with id {} was successfully deleted", id);
+        } catch (Exception e) {
+            LOGGER.error("Course with id {} was not deleted", id, e);
         }
     }
 
     public Course updateCourse(Course course) {
-        try{
-          Course updatedCourse =  courseRepository.save(course);
+        try {
+            Course updatedCourse = courseRepository.save(course);
             LOGGER.info("Course with title {} was successfully updated", updatedCourse.getTitle());
             return updatedCourse;
-        }catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("Course was not updated", e);
         }
         return null;

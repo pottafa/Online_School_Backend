@@ -1,4 +1,4 @@
-package ru.otus.onlineSchool.dataBase.entity;
+package ru.otus.onlineSchool.entity;
 
 import org.springframework.security.core.GrantedAuthority;
 

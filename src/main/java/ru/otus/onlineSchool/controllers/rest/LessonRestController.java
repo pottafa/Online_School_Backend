@@ -1,13 +1,13 @@
-package ru.otus.onlineSchool.controllers;
+package ru.otus.onlineSchool.controllers.rest;
 
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.otus.onlineSchool.dataBase.entity.Course;
-import ru.otus.onlineSchool.dataBase.entity.Lesson;
-import ru.otus.onlineSchool.dataBase.service.CourseService;
-import ru.otus.onlineSchool.dataBase.service.LessonService;
+import ru.otus.onlineSchool.entity.Course;
+import ru.otus.onlineSchool.entity.Lesson;
+import ru.otus.onlineSchool.service.CourseService;
+import ru.otus.onlineSchool.service.LessonService;
 
 
 @RestController
@@ -17,6 +17,7 @@ public class LessonRestController {
     @Autowired
     private CourseService courseService;
 
+    //TODO должно быть так: /api/courses/{courseId}/lessons/{lessonId}
     @PostMapping("/api/createLesson")
     public ResponseEntity<?> createLesson(@RequestBody CourseAndLesson json) {
         Lesson lesson = json.lesson;
@@ -33,6 +34,7 @@ public class LessonRestController {
         return ResponseEntity.ok(course.getLessons());
     }
 
+    //TODO должно быть так: /api/courses/{courseId}/lessons/{lessonId}
     @DeleteMapping("/api/deleteLesson")
     public ResponseEntity<?> deleteLesson(@RequestBody CourseAndLesson json) {
         Lesson lesson = json.lesson;
@@ -45,6 +47,7 @@ public class LessonRestController {
         return ResponseEntity.badRequest().body("There is no such lesson");
     }
 
+    //TODO должно быть так: /api/courses/{courseId}/lessons/{lessonId}
     @PutMapping("/api/updateLesson")
     public ResponseEntity<?> updateLesson(@RequestBody CourseAndLesson json) {
         Lesson lesson = json.lesson;
