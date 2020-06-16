@@ -1,7 +1,7 @@
-package ru.otus.onlineSchool.dataBase.repository;
+package ru.otus.onlineSchool.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.otus.onlineSchool.dataBase.entity.Role;
+import ru.otus.onlineSchool.entity.Role;
 
 public interface RoleRepository extends JpaRepository<Role, Long> {
 

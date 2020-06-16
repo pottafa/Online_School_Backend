@@ -1,12 +1,12 @@
-package ru.otus.onlineSchool.controllers;
+package ru.otus.onlineSchool.controllers.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.otus.onlineSchool.dataBase.entity.Role;
-import ru.otus.onlineSchool.dataBase.entity.User;
-import ru.otus.onlineSchool.dataBase.entity.UserProfile;
-import ru.otus.onlineSchool.dataBase.service.UserService;
+import ru.otus.onlineSchool.entity.Role;
+import ru.otus.onlineSchool.entity.User;
+import ru.otus.onlineSchool.entity.UserProfile;
+import ru.otus.onlineSchool.service.UserService;
 
 import java.util.Collections;
 import java.util.List;

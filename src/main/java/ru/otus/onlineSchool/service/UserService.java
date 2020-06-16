@@ -1,12 +1,12 @@
-package ru.otus.onlineSchool.dataBase.service;
+package ru.otus.onlineSchool.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.otus.onlineSchool.dataBase.entity.User;
-import ru.otus.onlineSchool.dataBase.repository.UserRepository;
+import ru.otus.onlineSchool.entity.User;
+import ru.otus.onlineSchool.repository.UserRepository;
 
 
 import java.util.ArrayList;

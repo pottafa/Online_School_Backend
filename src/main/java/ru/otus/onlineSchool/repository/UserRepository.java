@@ -1,8 +1,8 @@
-package ru.otus.onlineSchool.dataBase.repository;
+package ru.otus.onlineSchool.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ru.otus.onlineSchool.dataBase.entity.User;
+import ru.otus.onlineSchool.entity.User;
 
 import java.util.Optional;
 
