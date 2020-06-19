@@ -1,4 +1,4 @@
-package ru.otus.onlineSchool.controllers.rest;
+package ru.otus.onlineSchool.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,9 +13,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.repository.CourseRepository;
+import ru.otus.onlineSchool.repository.FakeCourseRepository;
 import ru.otus.onlineSchool.service.CourseService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +55,7 @@ class CourseRestControllerTest {
     private FakeCourseRepository fakeCourseRepository;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         fakeCourseRepository.reset();
     }
 
@@ -67,6 +68,7 @@ class CourseRestControllerTest {
                 .contentType("application/json")
                 .content(courseJson))
                 .andDo(print())
+                .andExpect(content().json("10"))
                 .andExpect(status().isOk());
 
         Course savedCourse = courseService.findCourseById(10);
@@ -76,15 +78,19 @@ class CourseRestControllerTest {
     }
 
     @Test
-    void createCourseErrorMessage() {
-//         TODO: при ошибке создания курса должен быть ответ 200, и сообщение об ошибке в JSON
-//         Примерно такое сообщение (можно расширить по своему усмотрению):
-//        {
-//            "status": 500,
-//            "message": "Failed create Course"
-//        }
+    void createCourseErrorMessage() throws Exception {
+        ApiError apiError = new ApiError("Failed create course");
+        String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
 
-        throw new UnsupportedOperationException("not implemented");
+        Course course = new Course(1, "course with existed id");
+        String courseJson = new ObjectMapper().writeValueAsString(course);
+
+        mvc.perform(post("/api/courses")
+                .contentType("application/json")
+                .content(courseJson))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
     }
 
     @Test
@@ -120,9 +126,16 @@ class CourseRestControllerTest {
     }
 
     @Test
-    void deleteCourseErrorMessage() {
-//        TODO: при ошибке удаления курса должен быть ответ 200, и сообщение об ошибке в JSON
-        throw new UnsupportedOperationException("not implemented");
+    void deleteCourseErrorMessage() throws Exception {
+        ApiError apiError = new ApiError("Failed delete course");
+        String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
+        long notExistedCourseId = 10;
+
+        mvc.perform(delete("/api/courses/" + notExistedCourseId)
+                .contentType("application/json"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
     }
 
     @Test
@@ -153,9 +166,31 @@ class CourseRestControllerTest {
     }
 
     @Test
-    void updateCourseErrorMessage() {
-//        TODO: при ошибке обновления курса должен быть ответ 200, и сообщение об ошибке в JSON
-        throw new UnsupportedOperationException("not implemented");
+    void updateCourseErrorMessage() throws Exception {
+        ApiError apiError = new ApiError("Failed update course");
+        String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
+        long courseId = 3;
+
+        // Проверим, что было в начале
+        Course course = courseService.findCourseById(courseId);
+        assertThat(course).isNotNull();
+        assertThat(course.getTitle()).isEqualTo("Course Three");
+        assertThat(course.getDescription()).isNullOrEmpty();
+
+        // Удалим курс
+        courseService.deleteCourse(courseId);
+
+        // Обновляем, сохраняем
+        course.setTitle("Course Three Updated Title");
+        course.setDescription("Course Three Updated Description");
+        String courseJson = new ObjectMapper().writeValueAsString(course);
+
+        mvc.perform(put("/api/courses/" + courseId)
+                .contentType("application/json")
+                .content(courseJson))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
     }
 
     @Test
@@ -167,6 +202,16 @@ class CourseRestControllerTest {
                 .andExpect(jsonPath("$.id").value(2))
                 .andExpect(jsonPath("$.title").value("Course Two"));
     }
+
+    @Test
+    public void getCourseErrorMessage() throws Exception {
+        ApiError apiError = new ApiError("Failed get course");
+        String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
+        long courseId = 10;
+
+        mvc.perform(get("/api/courses/" + courseId))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
+    }
 }
-
-

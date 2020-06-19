@@ -41,10 +41,36 @@ Description:<div th:text="${course.description}">
 <table class="lessons"  >
     <thead>
     <th>id</th>
-    <th>login</th>
-    <th>password</th>
-    <th>name</th>
-    <th>age</th>
+    <th>Title</th>
+    <th>Description</th>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+
+
+
+<h3>Create group</h3>
+<br>
+<form name="groups"  id="formgroup" onsubmit="saveGroup(event)">
+    <label>
+        Title <br/>
+        <input type="text" name="title" placeholder="title" required>
+    </label>
+    <br/>
+    <div>
+        <button onclick="saveGroup(event)" type="submit">Save</button>
+    </div>
+</form>
+<br><br>
+<button  onclick="showGroups()">Show groups</button>
+<br><br>
+<table class="groups"  >
+    <thead>
+    <th sec:authorize="hasRole('ROLE_ADMIN')">ID</th>
+    <th>Title</th>
+    <th>Number of users</th>
     </thead>
     <tbody>
     </tbody>
@@ -52,7 +78,7 @@ Description:<div th:text="${course.description}">
 
 <script th:inline="javascript">
     var course = [[${course}]];
-    var title = [[${course.title}]];
+    var id = [[${course.id}]];
 </script>
 
 
@@ -91,6 +117,70 @@ Description:<div th:text="${course.description}">
         </div>
     </div>
 </div>
+
+
+
+
+
+<div class="modal fade" id="modalGroupEditForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h4 class="modal-title w-100 font-weight-bold">Sign up</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mx-3">
+                <form id="edit-group-form">
+                    <div hidden="true" >
+                        <input type="text" id="modal-group-id" class="form-control validate">
+                    </div>
+                    <div class="md-form mb-5">
+                        <input type="text" id="modal-group-title" class="form-control validate">
+                        <label data-error="wrong" data-success="right" for="modal-title">Title</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button onclick="editGroupServer(this)" class="btn btn-deep-orange">Update</button>
+                <button class="btn btn-deep-orange">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<table id="userManagement">
+    <tr>
+        <td>Users</td>
+        <td></td>
+        <td>Users in group</td>
+    </tr>
+
+    <tr>
+        <td>
+        <select id="users" multiple="multiple">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+        </select>
+        </td>
+
+        <td>
+            <input id="but1" type="button" value=">>">
+            <input id="but2" type="button" value="<<">
+        </td>
+
+        <td>
+            <select id="groupusers" multiple="multiple">
+
+            </select>
+        </td>
+    </tr>
+</table>
+
 
 
 <script type="text/javascript" src="/js/jquery.min.js"></script>

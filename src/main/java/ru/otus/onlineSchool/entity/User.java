@@ -2,17 +2,18 @@ package ru.otus.onlineSchool.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.envers.Audited;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 
 @Entity
+@Audited
 @Table(name = "users")
 public class User implements Serializable, UserDetails {
     @Id
@@ -23,15 +24,6 @@ public class User implements Serializable, UserDetails {
     private String login;
     @Column(name = "password")
     private String password;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "users_groups",
-            joinColumns = {
-                    @JoinColumn(name = "user_id", referencedColumnName = "id",
-                            nullable = false, updatable = false)},
-            inverseJoinColumns = {
-                    @JoinColumn(name = "group_id", referencedColumnName = "id",
-                            nullable = false, updatable = false)})
-    private Set<Group> groups = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
@@ -43,24 +35,14 @@ public class User implements Serializable, UserDetails {
     public User() {
     }
 
-    public void addToTheGroup(Group group) {
-        groups.add(group);
-    }
-
-    public void removeFromTheGroup(Group group) {
-        groups.remove(group);
+    public User(long id, String login, String password) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
     }
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public Set<Group> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(Set<Group> groups) {
-        this.groups = groups;
     }
 
     public String getLogin() {

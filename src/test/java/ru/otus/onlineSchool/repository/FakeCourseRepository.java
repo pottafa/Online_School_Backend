@@ -1,13 +1,16 @@
-package ru.otus.onlineSchool.controllers.rest;
+package ru.otus.onlineSchool.repository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.otus.onlineSchool.entity.Course;
-import ru.otus.onlineSchool.repository.CourseRepository;
+import ru.otus.onlineSchool.entity.Group;
+import ru.otus.onlineSchool.entity.Lesson;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class FakeCourseRepository implements CourseRepository {
+
     private Map<Long, Course> courses;
 
     public FakeCourseRepository() {
@@ -16,9 +19,19 @@ public class FakeCourseRepository implements CourseRepository {
 
     public void reset() {
         courses = new HashMap<>();
-        courses.put(1L, new Course(1, "Course One"));
+        Course course1 = new Course(1, "Course One");
+
+        course1.addGroup(new Group(1, "Group one"));
+        course1.addGroup(new Group(2, "Group two"));
+
+        course1.addLesson(new Lesson(1, "Lesson one", "Some description"));
+        course1.addLesson(new Lesson(2, "Lesson two", "Some description"));
+
+        courses.put(1L, course1);
         courses.put(2L, new Course(2, "Course Two"));
         courses.put(3L, new Course(3, "Course Three"));
+
+
     }
 
     @Override
@@ -30,13 +43,9 @@ public class FakeCourseRepository implements CourseRepository {
     }
 
     @Override
-    public void deleteByTitle(String title) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Course save(Course course) {
-        return courses.put(course.getId(), course);
+        courses.put(course.getId(), course);
+        return course;
     }
 
     @Override
@@ -51,7 +60,7 @@ public class FakeCourseRepository implements CourseRepository {
 
     @Override
     public boolean existsById(Long id) {
-        throw new UnsupportedOperationException();
+        return courses.containsKey(id);
     }
 
     @Override

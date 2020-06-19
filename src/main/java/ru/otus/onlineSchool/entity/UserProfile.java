@@ -1,10 +1,12 @@
 package ru.otus.onlineSchool.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
 @Entity
+@Audited
 @Table(name = "profiles")
 public class UserProfile {
     @Id
@@ -23,6 +25,16 @@ public class UserProfile {
     @JoinColumn(name = "user_id")
     @JsonBackReference
     private User user;
+
+    public UserProfile() {
+    }
+
+    public UserProfile(long id, String name, String email, int age) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.age = age;
+    }
 
     public String getEmail() {
         return email;

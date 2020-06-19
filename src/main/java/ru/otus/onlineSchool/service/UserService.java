@@ -5,12 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.UserRepository;
 
-
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -21,9 +23,19 @@ public class UserService {
     private PasswordEncoder bCryptPasswordEncoder;
 
 
+    public User findUserById(long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if(user == null) {
+            LOGGER.error("User with id {} not found", id);
+            return null;
+        }
+        return user;
+    }
+
     public Long createUser(User user) {
-        User userFromDB = userRepository.findByLogin(user.getLogin()).orElse(null);
+        User userFromDB = userRepository.findById(user.getId()).orElse(null);
         if (userFromDB != null) return null;
+        LOGGER.error("Failed create user. User with id {} already exist", user.getId());
         Long id = null;
         try {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
@@ -42,22 +54,30 @@ public class UserService {
     }
 
 
-    public void deleteUser(Long id) {
-        try {
-            userRepository.deleteById(id);
-            LOGGER.info("User with id {} was successfully deleted", id);
-        } catch (Exception e) {
-            LOGGER.error("User with id {} was not deleted", id, e);
+    public boolean deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            LOGGER.info("User with id {} is already exist and cannot be deleted ", id);
+            return false;
         }
+        userRepository.deleteById(id);
+        LOGGER.info("User with id {} was successfully deleted", id);
+        return true;
     }
 
-    public void updateUser(User user) {
+    @Transactional
+    public User updateUser(User user) {
         try {
-            userRepository.save(user);
+            if(!userRepository.existsById(user.getId())) {
+                LOGGER.error("Failed update user. User with id {} not found", user.getId());
+                return null;
+            }
+           User updatedUser = userRepository.save(user);
             LOGGER.info("User with id {} was successfully updated", user.getId());
+            return updatedUser;
         } catch (Exception e) {
             LOGGER.error("User was not updated", e);
         }
+        return null;
     }
 
 }

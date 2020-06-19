@@ -3,12 +3,10 @@ package ru.otus.onlineSchool.controllers.rest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.otus.onlineSchool.entity.Role;
+import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.entity.User;
-import ru.otus.onlineSchool.entity.UserProfile;
 import ru.otus.onlineSchool.service.UserService;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -17,46 +15,47 @@ public class UserRestController {
     private UserService userService;
 
 
-    @PostMapping("/api/saveUser")
-    public ResponseEntity<?> saveUser(@RequestBody UserAndProfile json) {
-        User user = json.user;
-        user.setProfile(json.userProfile);
-        Long id = userService.createUser(user);
-        if (id != null) return ResponseEntity.ok(id);
-        else return ResponseEntity.badRequest().body(null);
+    @GetMapping("/api/users/{id}")
+    public ResponseEntity<?> getUser(@PathVariable("id") long id) {
+        User user = userService.findUserById(id);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.ok(new ApiError("Failed get user"));
+        }
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody User user) {
-        user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
+    @PostMapping("/api/users")
+    public ResponseEntity<?> createUser(@RequestBody User user) {
         Long id = userService.createUser(user);
         if (id != null) return ResponseEntity.ok(id);
-        else return ResponseEntity.badRequest().body(null);
+        else return ResponseEntity.ok(new ApiError("Failed create user"));
     }
 
-    @GetMapping("/api/getAllUsers")
-    public ResponseEntity<?> getAllUsers() {
+    @GetMapping("/api/users")
+    public ResponseEntity<?> getUsers() {
         List<User> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
     }
 
-    @DeleteMapping("/api/deleteUser")
-    public ResponseEntity<?> deleteUser(@RequestBody Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok(null);
+    @DeleteMapping("/api/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) {
+        boolean isDeleted = userService.deleteUser(id);
+        if (isDeleted) {
+            return ResponseEntity.ok(null);
+        } else {
+            return ResponseEntity.ok(new ApiError("Failed delete user"));
+        }
     }
 
-    @PutMapping("/api/updateUser")
-    public ResponseEntity<?> updateUser(@RequestBody UserAndProfile json) {
-        User user = json.user;
-        user.setProfile(json.userProfile);
-        userService.updateUser(user);
-        return ResponseEntity.ok(null);
-    }
-
-    static class UserAndProfile {
-        public UserProfile userProfile;
-        public User user;
+    @PutMapping("/api/users/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable("id") Long id, @RequestBody User user) {
+        User updatedUser = userService.updateUser(user);
+        if (updatedUser != null) {
+            return ResponseEntity.ok(null);
+        } else {
+            return ResponseEntity.ok(new ApiError("Failed update user"));
+        }
     }
 
 }

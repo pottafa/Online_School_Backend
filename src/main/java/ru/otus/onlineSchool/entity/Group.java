@@ -1,35 +1,50 @@
 package ru.otus.onlineSchool.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.envers.Audited;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
 @Entity
+@Audited
 @Table(name = "groups")
 public class Group implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-    @Column(name = "title")
+    @Column(name = "title", unique = true)
     private String title;
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "users_groups",
+            joinColumns = {
+                    @JoinColumn(name = "user_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)},
+            inverseJoinColumns = {
+                    @JoinColumn(name = "group_id", referencedColumnName = "id",
+                            nullable = false, updatable = false)})
     private List<User> users;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     private Course course;
 
     public Group() {
     }
 
+    public Group(long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+
 
     public void addStudent(User student) {
         users.add(student);
-        student.addToTheGroup(this);
     }
 
     public void removeStudent(User student) {
         users.remove(student);
-        student.removeFromTheGroup(this);
     }
 
     public List<User> getUsers() {
@@ -48,12 +63,20 @@ public class Group implements Serializable {
         this.course = course;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     @Override

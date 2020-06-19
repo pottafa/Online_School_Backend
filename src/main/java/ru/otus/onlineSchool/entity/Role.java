@@ -1,11 +1,13 @@
 package ru.otus.onlineSchool.entity;
 
+import org.hibernate.envers.Audited;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
+@Audited
 @Table(name = "roles")
 public class Role implements GrantedAuthority {
     @Id

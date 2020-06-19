@@ -15,7 +15,7 @@ public class CourseController {
 
     @RequestMapping(value = "/courses/{courseTitle}", method = RequestMethod.GET)
     public String getUser(@PathVariable String courseTitle, Model model) {
-        model.addAttribute("course", courseService.findCourse(courseTitle));
+        model.addAttribute("course", courseService.findCourseByTitle(courseTitle));
         return "course";
     }
 

@@ -1,11 +1,13 @@
 package ru.otus.onlineSchool.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
 
 @Entity
+@Audited
 @Table(name = "lessons")
 public class Lesson {
     @Id
@@ -16,9 +18,17 @@ public class Lesson {
     @Column(name = "description")
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
     @JsonBackReference
     private Course course;
+
+    public Lesson() {
+    }
+
+    public Lesson(long id, String title, String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
 
     public String getTitle() {
         return title;

@@ -13,4 +13,14 @@ insert into courses(id, title, description) values(3, 'Spring Boot', 'Курс �
 
 insert into courses(id, title, description) values (4, 'Java Script', 'Курс по JS');
 
+insert into roles (id, name) values ('0', 'ROLE_USER' );
+insert into roles (id, name) values ('1', 'ROLE_ADMIN' );
+insert into roles (id, name) values ('2', 'ROLE_TEACHER' );
+
+/*
+Admin creation
+Password: otus
+*/
+insert into users (id, login, password) values ('100', 'admin', '$2y$12$xAJNHHpZxsHQWDTBY9oVouIZgfAM3DrqIxW1J/s/wgvpv6G12Jr36' );
+insert into users_roles (user_id, roles_id) values ('100', '1' );
 

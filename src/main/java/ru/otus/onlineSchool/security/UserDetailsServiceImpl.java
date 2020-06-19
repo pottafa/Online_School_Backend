@@ -1,4 +1,4 @@
-package ru.otus.onlineSchool.service;
+package ru.otus.onlineSchool.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;

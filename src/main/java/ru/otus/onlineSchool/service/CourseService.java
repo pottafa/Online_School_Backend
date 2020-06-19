@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.repository.CourseRepository;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,19 +18,21 @@ public class CourseService {
     @Autowired
     private CourseRepository courseRepository;
 
-    public boolean createCourse(Course course) {
-        Course courseFromDB = courseRepository.findByTitle(course.getTitle()).orElse(null);
+
+    public Long createCourse(Course course) {
+        Course courseFromDB = courseRepository.findById(course.getId()).orElse(null);
         if (courseFromDB != null) {
             LOGGER.error("Course already exist");
-            return false;
+            return null;
         }
         try {
             Long id = courseRepository.save(course).getId();
             LOGGER.info("Course with id {} was successfully created", id);
+            return id;
         } catch (Exception e) {
             LOGGER.error("Course was not created", e);
         }
-        return true;
+        return null;
     }
 
     public List<Course> findAllCourses() {
@@ -38,35 +41,39 @@ public class CourseService {
         return courses;
     }
 
-    public Course findCourse(String title) {
-        Optional<Course> course = courseRepository.findByTitle(title);
-        return course.orElse(null);
-    }
-
     public Course findCourseById(long id) {
         Optional<Course> course = courseRepository.findById(id);
         return course.orElse(null);
     }
 
-    //Было так -- public void deleteCourse(String title) {
-    // удалять по title совсем плохо, надо по id
-    public void deleteCourse(Long id) {
-        try {
-            courseRepository.deleteById(id);
-            LOGGER.info("Course with id {} was successfully deleted", id);
-        } catch (Exception e) {
-            LOGGER.error("Course with id {} was not deleted", id, e);
-        }
+    public Course findCourseByTitle(String title) {
+        Optional<Course> course = courseRepository.findByTitle(title);
+        return course.orElse(null);
     }
 
-    public Course updateCourse(Course course) {
-        try {
-            Course updatedCourse = courseRepository.save(course);
-            LOGGER.info("Course with title {} was successfully updated", updatedCourse.getTitle());
-            return updatedCourse;
-        } catch (Exception e) {
-            LOGGER.error("Course was not updated", e);
+    public boolean deleteCourse(Long id) {
+        if (!courseRepository.existsById(id)) {
+            LOGGER.info("Course with id {} is already exist and cannot be deleted ", id);
+            return false;
         }
-        return null;
+        courseRepository.deleteById(id);
+        LOGGER.info("Course with id {} was successfully deleted", id);
+        return true;
     }
+
+    @Transactional
+    public Course updateCourse(Long id, Course course) {
+        Course courseFromDB = courseRepository.findById(id).orElse(null);
+        if (courseFromDB == null) {
+            LOGGER.info("Course with id {} was not updated", id);
+            return null;
+        }
+        courseFromDB.setTitle(course.getTitle());
+        courseFromDB.setDescription(course.getDescription());
+
+        Course updatedCourse = courseRepository.save(course);
+        LOGGER.info("Course with id {} was successfully updated", id);
+        return updatedCourse;
+    }
+
 }

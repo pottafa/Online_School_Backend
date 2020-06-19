@@ -3,7 +3,6 @@ var currentRow ;
 
 function editUserServer() {
     var elements = document.getElementById("edit-form").elements;
-    var json = {};
     var user ={
     id : $("#modal-id").val(),
     login : $("#modal-login").val(),
@@ -13,13 +12,12 @@ function editUserServer() {
       name : $("#modal-name").val(),
               age : $("#modal-age").val()
       };
-json["user"] = user;
-        json["userProfile"] = userProfile;
+        user["userProfile"] = userProfile;
   $.ajax({
              type: "PUT",
              contentType: "application/json",
-             url: "/api/updateUser",
-             data: JSON.stringify(json),
+             url: "/api/users/"+ $("#modal-id").val(),
+             data: JSON.stringify(user),
              cache: false,
              timeout: 600000,
              success: function (id) {
@@ -45,15 +43,16 @@ function editUser(button) {
      $('#modalEditForm').modal('show');
     }
 
-function createUserRow(id ,login, password, name, age) {
+function createUserRow(id ,login, password, name, age, roles) {
+
   return "<tr>" + "<td class=\"user-id\">" + id + "</td>" + "<td class=\"user-login\">" + login + "</td>" +
-             "<td class=\"user-password\">" + password + "</td>" + "<td class=\"user-name\">" + name + "</td>" + "<td class=\"user-age\">" + age + "</td>"
+             "<td class=\"user-password\">" + password + "</td>" + "<td class=\"user-roles\">" + roles + "</td>" + "<td class=\"user-name\">" + name + "</td>" + "<td class=\"user-age\">" + age + "</td>"
              + "<td><button onclick=\"editUser(this)\">EDIT</button></td>"  + "   " + "<td>" +"<button onclick=\"deleteUser(this)\">Delete</button>" + "</td>" + "</tr>";
 }
 
 
 function getAllUsers()
-{   $.getJSON('/api/getAllUsers', function (data) {
+{   $.getJSON('/api/users', function (data) {
 $(".users").find("tbody").empty();
        $.each(data, function(i, f) {
         let name;
@@ -63,7 +62,11 @@ $(".users").find("tbody").empty();
     if( profile["name"] != null) name = profile["name"];
     if( profile["age"] != null) age = profile["age"];
       }
-        var new_row =  createUserRow(f.id ,f.login, f.password, name, age)
+       var table_roles = "";
+                            for(var i=0; i<(f.roles).length; ++i){
+                                table_roles = table_roles + (f.roles)[i].name + "<br>";
+                                }
+        var new_row =  createUserRow(f.id ,f.login, f.password, name, age, table_roles)
         $(new_row).appendTo(".users tbody");
      });
         });
@@ -71,11 +74,11 @@ $(".users").find("tbody").empty();
 
 
 function deleteUser(button) {
+let id = $(button).parent().siblings(":first").text();
 $.ajax({
            type: "DELETE",
            contentType: "application/json",
-           url: "/api/deleteUser",
-           data: JSON.stringify($(button).parent().siblings(":first").text()),
+           url: "/api/users/" + id,
            cache: false,
            timeout: 600000,
            success: function (json) {
@@ -89,13 +92,12 @@ $.ajax({
 
 function saveUser(e) {
  e.preventDefault();
-    var elements = document.getElementById("formuser").elements;
-    var json ={};
-    var user ={};
-
+    let elements = document.getElementById("formuser").elements;
+    let user ={};
     let role = {};
-    role.name = $('#Id :selected').val();
-    role.id = $("#roles")[0].selectedIndex;
+    var roles_selection = document.getElementById("roles");
+    role_name = roles_selection.options[roles_selection.selectedIndex].text;
+    role.id = roles_selection.options[roles_selection.selectedIndex].value;
      user.roles = [role];
 
     var userProfile ={};
@@ -107,45 +109,43 @@ function saveUser(e) {
             var item = elements.item(i);
             userProfile[item.name] = item.value;
         }
-json["user"] = user;
-        json["userProfile"] = userProfile;
+        user["userProfile"] = userProfile;
 
-  $.ajax({
-             type: "POST",
-             contentType: "application/json",
-             url: "/api/saveUser",
-             data: JSON.stringify(json),
-             cache: false,
-             timeout: 600000,
-             success: function (id) {
-             document.getElementById('formuser').reset();
-          var new_row =   createUserRow(JSON.parse(id) ,user.login, user.password, userProfile.name, userProfile.age);
-            $(new_row).appendTo(".users tbody");
-             },
-             error: function (e) {
-             alert("User was not saved")
-                        }
-  });
+ $.ajax({
+               type: "POST",
+               contentType: "application/json",
+               url: "/api/users",
+               data: JSON.stringify(user),
+               cache: false,
+               timeout: 600000,
+               success: function (id) {
+               document.getElementById('formuser').reset();
+                           var new_row = createUserRow(id ,user.login, user.password, userProfile.name, userProfile.age,  role_name);
+                             $(new_row).appendTo(".users tbody");
+               },
+               error: function (e) {
+               alert(e);
+               return false;
+                          }
+    });
       return false;
-
 }
 
 function showCourses()
-{   $.getJSON('/api/getAllCourses', function (data) {
+{   $.getJSON('/api/courses', function (data) {
 $(".courses").find("tbody").empty();
        $.each(data, function(i, f) {
-        var new_row =  createCourseRow(f.title, (f.groups).length, f.description)
+        var new_row =  createCourseRow(f.title, f.id)
         $(new_row).appendTo(".courses tbody");
      });
         });
   };
 
-  function createCourseRow(title ,numGroups, description) {
-    return "<tr>" + "<td class=\"course-title\">" + title + "</td>" +
-               "<td class=\"course-groups\">" + numGroups + "</td>" + "<td class=\"course-description\">" +
-                 "<textarea name=\"description\" rows=\"5\" cols=\"30\">" + description + "</textarea> </td>" +
+  function createCourseRow(title, id) {
+    return "<tr>" + "<td class=\"course-id\">" + id + "</td>" + "<td class=\"course-title\">" + title + "</td>" +
                   "<td><button onclick=\"return coursePage(this)\">Course page</button></td>"  + "   " + "<td>" +"<button onclick=\"deleteCourse(this)\">Delete</button>" + "</td>" + "</tr>";
   }
+
 
 function createCourse(e) {
  e.preventDefault();
@@ -158,13 +158,13 @@ function createCourse(e) {
   $.ajax({
              type: "POST",
              contentType: "application/json",
-             url: "/api/createCourse",
+             url: "/api/courses",
              data: JSON.stringify(obj),
              cache: false,
              timeout: 600000,
              success: function (id) {
              document.getElementById('formCourse').reset();
-          var new_row =   createCourseRow(obj.title, 0 , obj.description);
+          var new_row =   createCourseRow(obj.title, 0 , obj.description, JSON.parse(id));
             $(new_row).appendTo(".courses tbody");
              },
              error: function (e) {
@@ -176,11 +176,11 @@ function createCourse(e) {
 }
 
 function deleteCourse(button) {
+let courseId = $(button).parent().siblings(":first").text();
 $.ajax({
            type: "DELETE",
            contentType: "application/json",
-           url: "/api/deleteCourse",
-           data: JSON.stringify($(button).parent().siblings(":first").text()),
+           url: "/api/courses/" + courseId,
            cache: false,
            timeout: 600000,
            success: function (json) {
@@ -193,7 +193,7 @@ $.ajax({
 }
 
 function coursePage(button) {
-var title = $(button).parent().siblings(":first").text();
+var title = $(button).parent().siblings(":nth-child(2)").text();
 window.location.href = "courses/"+title;
 
    return true;
