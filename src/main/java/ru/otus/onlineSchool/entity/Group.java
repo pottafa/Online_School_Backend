@@ -19,11 +19,11 @@ public class Group implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_groups",
             joinColumns = {
-                    @JoinColumn(name = "user_id", referencedColumnName = "id",
-                            nullable = false, updatable = false)},
+                    @JoinColumn(name = "user_id", referencedColumnName = "id"
+                         )},
             inverseJoinColumns = {
-                    @JoinColumn(name = "group_id", referencedColumnName = "id",
-                            nullable = false, updatable = false)})
+                    @JoinColumn(name = "group_id", referencedColumnName = "id"
+                           )})
     private List<User> users;
 
     @ManyToOne(fetch = FetchType.LAZY)

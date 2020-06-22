@@ -30,7 +30,7 @@ public class User implements Serializable, UserDetails {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private UserProfile profile;
+    private UserProfile profile = new UserProfile();
 
     public User() {
     }

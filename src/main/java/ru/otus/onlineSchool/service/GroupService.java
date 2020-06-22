@@ -6,10 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Group;
+import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.CourseRepository;
+import ru.otus.onlineSchool.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
@@ -17,6 +21,8 @@ public class GroupService {
 
     @Autowired
     private CourseRepository courseRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public Group findGroupById(Course course, long groupId) {
         return course.getGroups().stream()
@@ -65,7 +71,7 @@ public class GroupService {
     }
 
     @Transactional
-    public Course updateGroup(Long courseId, Long groupId, Group group) {
+    public Group updateGroup(Long courseId, Long groupId, Group group) {
         Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null) {
             LOGGER.error("Failed update group. Course with id {} not exist", courseId);
@@ -84,7 +90,39 @@ public class GroupService {
         }
         Course updatedCourse = courseRepository.save(course);
         LOGGER.info("Group with id {} was successfully updated", groupId);
-        return updatedCourse;
+        return findGroupById(updatedCourse, groupId);
+    }
+
+    @Transactional
+    public Group addUsers(Long courseId, Long groupId, List<Long> usersId) {
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if (course == null) {
+            LOGGER.error("Failed add users. Course with id {} not exist", courseId);
+            return null;
+        }
+        Group courseGroup = findGroupById(course, groupId);
+        if (courseGroup == null) {
+            LOGGER.error("Failed add users. Error while retrieving group from Course with id {}", courseId);
+            return null;
+        }
+        List<User> users;
+        try {
+                   users = usersId.stream()
+                    .map(userId -> userRepository.findById(userId).orElseThrow(()-> new NoSuchElementException(String.valueOf(userId))))
+                    .collect(Collectors.toList());
+        } catch (Exception ex) {
+            LOGGER.error("Failed add users. Error while getting users.", ex);
+            return null;
+        }
+        courseGroup.setUsers(users);
+        boolean isUpdated = course.updateGroup(courseGroup);
+        if (!isUpdated) {
+            LOGGER.error("Failed update group in Course with id {}", courseId);
+            return null;
+        }
+        Course updatedCourse = courseRepository.save(course);
+        LOGGER.info("Group with id {} was successfully updated", groupId);
+        return courseGroup;
     }
 
 }

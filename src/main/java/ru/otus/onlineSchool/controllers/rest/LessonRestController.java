@@ -62,10 +62,10 @@ public class LessonRestController {
     @PutMapping("/api/courses/{courseId}/lessons/{lessonId}")
     public ResponseEntity<?> updateLesson(@PathVariable("courseId") Long courseId, @PathVariable("lessonId") Long lessonId,
                                           @RequestBody Lesson lesson) {
-        Course updatedCourse = lessonService.updateLesson(courseId, lessonId, lesson);
-        if (updatedCourse == null) {
+        Lesson updatedLesson = lessonService.updateLesson(courseId, lessonId, lesson);
+        if (updatedLesson == null) {
             return ResponseEntity.ok(new ApiError("Failed update lesson"));
         }
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(updatedLesson);
     }
 }

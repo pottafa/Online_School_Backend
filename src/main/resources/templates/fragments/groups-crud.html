@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <group_title>Title</group_title>
+</head>
+<body>
+
+<div class="fragment" th:fragment="groups">
+
+    <h1>Groups</h1>
+
+    <button type="button" class="button" id="add_group">Add group</button>
+    <button type="button" class="button" id="refresh_groups">Refresh</button>
+
+    <table class="datatable" id="table_groups">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Users count</th>
+            <th>Functions</th>
+            <th>Manage users</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div class="lightbox_bg"></div>
+
+    <div class="lightbox_container group">
+        <div class="lightbox_close"></div>
+        <div class="lightbox_content">
+
+            <h2>Add group</h2>
+            <form class="form add" id="form_group" data-id="" novalidate>
+                <div class="input_container">
+                    <label for="group_title">Title: <span class="required">*</span></label>
+                    <div class="field_container">
+                        <input type="text" class="text" name="title" id="group_title" value="" required>
+                    </div>
+                </div>
+
+                <div class="button_container">
+                    <button type="submit">Add groups</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="lightbox_container user_management">
+<div class="user_management" id="user_management">
+    <div class="lightbox_close"></div>
+    <div class="lightbox_content users_management">
+    <div class="content">
+        <select multiple="multiple" id="users">
+
+        </select>
+        <div>
+            <span id="add">Add</span>
+            <span id="add_all" >Add All</span>
+        </div>
+    </div>
+
+    <div class="content">
+        <select multiple="multiple" id="groupusers">
+
+        </select>
+        <div>
+            <span id="remove">Remove</span>
+            <span id="remove_all">Remove All</span>
+        </div>
+    </div>
+
+    <button type="button" class="button" id="send_users">Save</button>
+    </div>
+</div>
+    </div>
+
+
+</div>
+
+</body>
+</html>

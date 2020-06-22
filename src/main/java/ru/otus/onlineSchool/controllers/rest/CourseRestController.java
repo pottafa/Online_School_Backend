@@ -63,7 +63,7 @@ public class CourseRestController {
         if (updatedCourse == null) {
             return ResponseEntity.ok(new ApiError("Failed update course"));
         }
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(modelMapper.map(updatedCourse, CourseMenuItemDTO.class));
     }
 
 

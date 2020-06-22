@@ -39,47 +39,34 @@ img {
             <input type="password" name="password">
         </label>
         <br/>
-        <label>
-            name <br/>
-            <input type="text" name="name"  placeholder="name">
-        </label>
-        <br/>
-        <label>
-            age<br/>
-            <input type="number"  name="age"  placeholder="age" min="7" max="120" value="7">
-        </label><br/>
-        <br/>
         <button onclick="saveUser(event)" type="submit">Sign up</button>
     </form>
 </div>
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script>
-    function saveUser(e) {
- e.preventDefault();
-    var elements = document.getElementById("signup").elements;
-    var obj ={};
-    for(var i = 0 ; i < elements.length ; i++){
-        var item = elements.item(i);
-        obj[item.name] = item.value;
-    }
 
-  $.ajax({
-             type: "POST",
-             contentType: "application/json",
-             url: "/signup",
-             data: JSON.stringify(obj),
-             cache: false,
-             timeout: 600000,
-             success: function (id) {
-window.location.replace("/login");
-             },
-             error: function (e) {
-             alert("Registration error")
-                        }
-  });
-      return false;
-
+function saveUser(e) {
+var user = {};
+const form_data = new FormData(document.querySelector('#signup'));
+form_data.forEach(function(value, key){
+user[key] = value;
+});
+// Send user information to database
+var request   = $.ajax({
+url:          '/api/users',
+cache:        false,
+data:         JSON.stringify(user),
+contentType: "application/json",
+type:         'POST',
+success: function (id) {
+window.location.replace("/admin-panel");
+},
+error: function (e) {
+alert("Registration error");
+}
+});
 }
 </script>
 </body>
 </html>
+

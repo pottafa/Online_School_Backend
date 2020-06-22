@@ -65,7 +65,7 @@ public class LessonService {
     }
 
     @Transactional
-    public Course updateLesson(Long courseId, Long lessonId, Lesson lesson) {
+    public Lesson updateLesson(Long courseId, Long lessonId, Lesson lesson) {
         Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null) {
             LOGGER.error("Failed update lesson. Course with id {} not exist", courseId);
@@ -85,6 +85,6 @@ public class LessonService {
         }
 Course updatedCourse = courseRepository.save(course);
         LOGGER.info("Lesson with id {} was successfully updated", lessonId);
-        return updatedCourse;
+        return findLessonById(updatedCourse, lessonId);
     }
 }

@@ -1,9 +1,9 @@
 package ru.otus.onlineSchool.dto;
 
-public class CourseMenuItemDTO {
+public class GroupMenuItemDTO {
    private long id;
    private String title;
-   private String description;
+   private int usersCount;
 
     public long getId() {
         return id;
@@ -21,11 +21,11 @@ public class CourseMenuItemDTO {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+    public int getUsersCount() {
+        return usersCount;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setUsersCount(int usersCount) {
+        this.usersCount = usersCount;
     }
 }

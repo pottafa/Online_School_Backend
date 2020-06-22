@@ -13,9 +13,9 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
 
-    @RequestMapping(value = "/courses/{courseTitle}", method = RequestMethod.GET)
-    public String getUser(@PathVariable String courseTitle, Model model) {
-        model.addAttribute("course", courseService.findCourseByTitle(courseTitle));
+    @RequestMapping(value = "/courses/{courseId}", method = RequestMethod.GET)
+    public String getUser(@PathVariable Long courseId, Model model) {
+        model.addAttribute("course", courseService.findCourseById(courseId));
         return "course";
     }
 

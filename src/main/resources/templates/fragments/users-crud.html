@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div class="fragment" th:fragment="users">
+
+    <h1>Users</h1>
+
+    <button type="button" class="button" id="add_user">Add user</button>
+    <button type="button" class="button" id="refresh_users">Refresh</button>
+
+    <table class="datatable" id="table_users">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Login</th>
+            <th>Roles</th>
+            <th>Functions</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <div class="lightbox_bg"></div>
+
+    <div class="lightbox_container">
+        <div class="lightbox_close"></div>
+        <div class="lightbox_content">
+
+            <h2>Add user</h2>
+            <form class="form add" id="form_user" data-id="" novalidate>
+                <div class="input_container">
+                    <label for="login">Login: <span class="required">*</span></label>
+                    <div class="field_container">
+                        <input type="text" class="text" name="login" id="login" value="" required>
+                    </div>
+                </div>
+                <div class="input_container">
+                    <label for="password">Password: <span class="required">*</span></label>
+                    <div class="field_container">
+                        <input type="text" class="text" name="password" id="password" value="" required>
+                    </div>
+                </div>
+                <div class="button_container">
+                    <button type="submit">Add users</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+

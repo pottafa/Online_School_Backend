@@ -3,190 +3,55 @@
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <meta name="viewport" content="width=1000, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/mdb.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/layout.css">
+
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script charset="utf-8" src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script charset="utf-8" src="/js/lessons-crud.js"></script>
+    <script charset="utf-8" src="/js/groups-crud.js"></script>
+    <script charset="utf-8" src="//cdn.jsdelivr.net/jquery.validation/1.13.1/jquery.validate.min.js"></script>
+
+
     <title th:text="${course.title}">course</title>
 </head>
 <body>
-Title:<h2 th:text="${course.title}"> Title</h2>
-Description:<div th:text="${course.description}">
+
+<div id="course_container" class="container">
+    <h2  class="section-title-underline mb-5">
+        <span th:text="${course.title}"></span>
+    </h2>
+
+    <div th:text="${course.description}"></div>
+    <p>
+        <a href="#" class="btn btn-primary rounded-0 btn-lg px-5">Enroll</a>
+    </p>
+
+    <ul class="nav nav-pills nav-justified">
+        <li><a id="load_lessons" href="#lessons_tab" data-toggle="pill">Lessons</a></li>
+        <li><a id="load_groups" href="#groups_tab" data-toggle="pill">Groups</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="lessons_tab" class="tab-pane fade" th:insert="fragments/lessons-crud :: lessons"></div>
+        <div id="groups_tab" class="tab-pane fade" th:insert="fragments/groups-crud :: groups"></div>
+
+    </div>
 </div>
-
-
-
-
-
-
-
-<h4>Add lesson</h4>
-
-<form name="lessons"  id="formlesson" onsubmit="saveLesson(event)">
-    <label>
-        Title <br/>
-        <input type="text" name="title" placeholder="title" required>
-    </label>
-    <br/>
-    <label>
-        Description<br/>
-        <input type="text"  name="description"  placeholder="description" required>
-    </label>
-    <div>
-        <button onclick="saveLesson(event)" type="submit">Save</button>
-    </div>
-</form>
-<br>
-<button  onclick="showLessons()">Show lessons</button>
-<br>
-<table class="lessons"  >
-    <thead>
-    <th>id</th>
-    <th>Title</th>
-    <th>Description</th>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
-
-
-
-
-<h3>Create group</h3>
-<br>
-<form name="groups"  id="formgroup" onsubmit="saveGroup(event)">
-    <label>
-        Title <br/>
-        <input type="text" name="title" placeholder="title" required>
-    </label>
-    <br/>
-    <div>
-        <button onclick="saveGroup(event)" type="submit">Save</button>
-    </div>
-</form>
-<br><br>
-<button  onclick="showGroups()">Show groups</button>
-<br><br>
-<table class="groups"  >
-    <thead>
-    <th sec:authorize="hasRole('ROLE_ADMIN')">ID</th>
-    <th>Title</th>
-    <th>Number of users</th>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
 
 <script th:inline="javascript">
     var course = [[${course}]];
-    var id = [[${course.id}]];
+    var course_id = [[${course.id}]];
 </script>
 
 
-
-
-
-<div class="modal fade" id="modalLessonEditForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold">Sign up</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body mx-3">
-                <form id="edit-form">
-                    <div hidden="true" >
-                        <input type="text" id="modal-id" class="form-control validate">
-                    </div>
-                    <div class="md-form mb-5">
-                        <input type="text" id="modal-title" class="form-control validate">
-                        <label data-error="wrong" data-success="right" for="modal-title">Title</label>
-                    </div>
-                    <div class="md-form mb-5">
-                        <label for="modal-description">Description</label>
-                        <textarea class="form-control" id="modal-description" rows="4"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer d-flex justify-content-center">
-                <button onclick="editLessonServer(this)" class="btn btn-deep-orange">Update</button>
-                <button class="btn btn-deep-orange">Cancel</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
-<div class="modal fade" id="modalGroupEditForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header text-center">
-                <h4 class="modal-title w-100 font-weight-bold">Sign up</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body mx-3">
-                <form id="edit-group-form">
-                    <div hidden="true" >
-                        <input type="text" id="modal-group-id" class="form-control validate">
-                    </div>
-                    <div class="md-form mb-5">
-                        <input type="text" id="modal-group-title" class="form-control validate">
-                        <label data-error="wrong" data-success="right" for="modal-title">Title</label>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer d-flex justify-content-center">
-                <button onclick="editGroupServer(this)" class="btn btn-deep-orange">Update</button>
-                <button class="btn btn-deep-orange">Cancel</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<table id="userManagement">
-    <tr>
-        <td>Users</td>
-        <td></td>
-        <td>Users in group</td>
-    </tr>
-
-    <tr>
-        <td>
-        <select id="users" multiple="multiple">
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-        </select>
-        </td>
-
-        <td>
-            <input id="but1" type="button" value=">>">
-            <input id="but2" type="button" value="<<">
-        </td>
-
-        <td>
-            <select id="groupusers" multiple="multiple">
-
-            </select>
-        </td>
-    </tr>
-</table>
-
-
-
-<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+<script type="text/javascript" src="/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/js/popper.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/js/mdb.min.js"></script>
-<script type="text/javascript" src="/js/course.js"></script>
 </body>
 </html>
