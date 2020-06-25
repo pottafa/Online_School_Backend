@@ -18,6 +18,7 @@
         <tr>
             <th>Id</th>
             <th>Login</th>
+            <th>Email</th>
             <th>Roles</th>
             <th>Functions</th>
         </tr>
@@ -28,7 +29,7 @@
 
     <div class="lightbox_bg"></div>
 
-    <div class="lightbox_container">
+    <div class="lightbox_container users">
         <div class="lightbox_close"></div>
         <div class="lightbox_content">
 
@@ -40,10 +41,16 @@
                         <input type="text" class="text" name="login" id="login" value="" required>
                     </div>
                 </div>
-                <div class="input_container">
+                <div class="input_container password">
                     <label for="password">Password: <span class="required">*</span></label>
                     <div class="field_container">
                         <input type="text" class="text" name="password" id="password" value="" required>
+                    </div>
+                </div>
+                <div class="input_container">
+                    <label for="email">Email: </label>
+                    <div class="field_container">
+                        <input type="text" class="text" name="email" id="email" value="">
                     </div>
                 </div>
                 <div class="button_container">
@@ -52,6 +59,8 @@
             </form>
         </div>
     </div>
+
+    <div th:insert="fragments/notifications :: notifications"></div>
 
 </div>
 

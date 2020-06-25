@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.otus.onlineSchool.entity.Course;
+import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.CourseRepository;
 
 import javax.transaction.Transactional;
@@ -41,8 +42,8 @@ public class CourseService {
         return courses;
     }
 
-    public Course findCourseById(long id) {
-        Optional<Course> course = courseRepository.findById(id);
+    public Course findCourseById(long courseId) {
+        Optional<Course> course = courseRepository.findById(courseId);
         return course.orElse(null);
     }
 
@@ -51,28 +52,35 @@ public class CourseService {
         return course.orElse(null);
     }
 
-    public boolean deleteCourse(Long id) {
-        if (!courseRepository.existsById(id)) {
-            LOGGER.info("Course with id {} is already exist and cannot be deleted ", id);
+    public boolean deleteCourse(Long courseId) {
+        if (!courseRepository.existsById(courseId)) {
+            LOGGER.info("Course with id {} is already exist and cannot be deleted ", courseId);
             return false;
         }
-        courseRepository.deleteById(id);
-        LOGGER.info("Course with id {} was successfully deleted", id);
+        courseRepository.deleteById(courseId);
+        LOGGER.info("Course with id {} was successfully deleted", courseId);
         return true;
     }
 
     @Transactional
-    public Course updateCourse(Long id, Course course) {
-        Course courseFromDB = courseRepository.findById(id).orElse(null);
+    public Course updateCourse(Long courseId, Course course) {
+        Course courseFromDB = courseRepository.findById(courseId).orElse(null);
         if (courseFromDB == null) {
-            LOGGER.info("Course with id {} was not updated", id);
+            LOGGER.info("Course with id {} was not updated", courseId);
             return null;
         }
         courseFromDB.setTitle(course.getTitle());
         courseFromDB.setDescription(course.getDescription());
 
         Course updatedCourse = courseRepository.save(course);
-        LOGGER.info("Course with id {} was successfully updated", id);
+        LOGGER.info("Course with id {} was successfully updated", courseId);
+        return updatedCourse;
+    }
+
+    @Transactional
+    public Course updateCourse(Course course) {
+        Course updatedCourse = courseRepository.save(course);
+        LOGGER.info("Course with id {} was successfully updated", updatedCourse.getId());
         return updatedCourse;
     }
 

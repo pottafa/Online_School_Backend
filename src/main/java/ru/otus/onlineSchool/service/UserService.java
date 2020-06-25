@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.otus.onlineSchool.entity.Course;
+import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.UserRepository;
 
@@ -23,10 +24,10 @@ public class UserService {
     private PasswordEncoder bCryptPasswordEncoder;
 
 
-    public User findUserById(long id) {
-        User user = userRepository.findById(id).orElse(null);
+    public User findUserById(long userId) {
+        User user = userRepository.findById(userId).orElse(null);
         if(user == null) {
-            LOGGER.error("User with id {} not found", id);
+            LOGGER.error("User with id {} not found", userId);
             return null;
         }
         return user;
@@ -54,30 +55,20 @@ public class UserService {
     }
 
 
-    public boolean deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            LOGGER.info("User with id {} is already exist and cannot be deleted ", id);
+    public boolean deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            LOGGER.info("User with id {} is already exist and cannot be deleted ", userId);
             return false;
         }
-        userRepository.deleteById(id);
-        LOGGER.info("User with id {} was successfully deleted", id);
+        userRepository.deleteById(userId);
+        LOGGER.info("User with id {} was successfully deleted", userId);
         return true;
     }
 
-    @Transactional
     public User updateUser(User user) {
-        try {
-            if(!userRepository.existsById(user.getId())) {
-                LOGGER.error("Failed update user. User with id {} not found", user.getId());
-                return null;
-            }
-           User updatedUser = userRepository.save(user);
-            LOGGER.info("User with id {} was successfully updated", user.getId());
-            return updatedUser;
-        } catch (Exception e) {
-            LOGGER.error("User was not updated", e);
-        }
-        return null;
+       User updatedUser = userRepository.save(user);
+        LOGGER.info("User with id {} was successfully updated", updatedUser.getId());
+        return updatedUser;
     }
 
 }

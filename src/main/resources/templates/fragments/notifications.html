@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div class="fragment" th:fragment="notifications">
+
+    <div class="lightbox_container notification">
+            <div class="lightbox_close"></div>
+            <div class="lightbox_content notification">
+
+                <h2>Send notification</h2>
+                <form class="form add" id="form_notification" data-id="" novalidate>
+                    <div class="input_container">
+                        <label for="notification_subject">Subject: <span class="required">*</span></label>
+                        <div class="field_container">
+                            <input type="text" class="text" name="subject" id="notification_subject" value="" required>
+                        </div>
+                    </div>
+                    <div class="input_container">
+                        <label for="notification_message">Message: <span class="required">*</span></label>
+                        <div class="field_container">
+                            <textarea class="text" name="message" id="notification_message" required rows="4" cols="50"> </textarea>
+                        </div>
+                    </div>
+                    <div class="input_container">
+                        <label for="notification_date">Date to sent: <span class="required">*</span></label>
+                        <div class="field_container">
+                            <input type="datetime-local" id="notification_date" name="date">
+                        </div>
+                    </div>
+                    <div class="button_container">
+                        <button type="submit">Send</button>
+                    </div>
+                </form>
+
+            </div>
+    </div>
+
+</div>
+
+</body>
+</html>
+

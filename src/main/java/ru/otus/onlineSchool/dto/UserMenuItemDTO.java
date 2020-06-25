@@ -3,12 +3,20 @@ package ru.otus.onlineSchool.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserMenuItemDTO {
-   private long id;
+   private Long id;
    private String login;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String roles;
+    private String email;
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getPassword() {
         return password;
@@ -18,11 +26,11 @@ public class UserMenuItemDTO {
         this.password = password;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -27,15 +27,11 @@ public class Group implements Serializable {
     private List<User> users;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)
     @JsonBackReference
     private Course course;
 
     public Group() {
-    }
-
-    public Group(long id, String title) {
-        this.id = id;
-        this.title = title;
     }
 
 

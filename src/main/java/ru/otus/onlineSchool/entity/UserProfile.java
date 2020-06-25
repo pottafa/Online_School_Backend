@@ -15,8 +15,6 @@ public class UserProfile {
     private Long id;
     @Column(name = "name")
     private String name;
-    @Column(name = "email")
-    private String email;
 
     @Column(name = "age")
     private int age;
@@ -29,19 +27,10 @@ public class UserProfile {
     public UserProfile() {
     }
 
-    public UserProfile(long id, String name, String email, int age) {
+    public UserProfile(long id, String name, int age) {
         this.id = id;
         this.name = name;
-        this.email = email;
         this.age = age;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public int getAge() {

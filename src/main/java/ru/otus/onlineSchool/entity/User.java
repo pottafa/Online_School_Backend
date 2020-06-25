@@ -24,21 +24,26 @@ public class User implements Serializable, UserDetails {
     private String login;
     @Column(name = "password")
     private String password;
+    @Column(name = "email")
+    private String email;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private UserProfile profile = new UserProfile();
+    private UserProfile profile;
 
     public User() {
     }
 
-    public User(long id, String login, String password) {
-        this.id = id;
-        this.login = login;
-        this.password = password;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setId(long id) {

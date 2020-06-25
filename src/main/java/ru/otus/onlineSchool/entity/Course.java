@@ -19,71 +19,6 @@ public class Course {
     private String title;
     @Column(name = "description")
     private String description;
-    @OneToMany(
-            mappedBy = "course",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<Group> groups = new ArrayList<>();
-
-    @OneToMany(
-            mappedBy = "course",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    @JsonManagedReference
-    private List<Lesson> lessons = new ArrayList<>();
-
-    public Course(long id, String title) {
-        this.id = id;
-        this.title = title;
-    }
-
-    public boolean addLesson(Lesson lesson) {
-        if (lessons.contains(lesson)) {
-            return false;
-        }
-        lesson.setCourse(this);
-        return lessons.add(lesson);
-    }
-
-    public boolean removeLesson(Lesson lesson) {
-        if (!lessons.contains(lesson)) {
-            return false;
-        }
-        lesson.setCourse(null);
-        return lessons.remove(lesson);
-
-    }
-
-    public boolean updateLesson(Lesson lesson) {
-        if (!lessons.remove(lesson)) {
-            return false;
-        }
-        lesson.setCourse(this);
-        return lessons.add(lesson);
-    }
-
-    public boolean addGroup(Group group) {
-        if (groups.contains(group)) {
-            return false;
-        }
-        group.setCourse(this);
-        return groups.add(group);
-    }
-
-    public boolean updateGroup(Group group) {
-        if (!groups.remove(group)) return false;
-        group.setCourse(this);
-        return groups.add(group);
-    }
-
-    public boolean removeGroup(Group group) {
-        if (!groups.contains(group)) return false;
-        group.setCourse(null);
-        return groups.remove(group);
-    }
-
 
     public Course() {
     }
@@ -102,22 +37,6 @@ public class Course {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
-    }
-
-    public List<Lesson> getLessons() {
-        return lessons;
-    }
-
-    public void setLessons(List<Lesson> lessons) {
-        this.lessons = lessons;
     }
 
     public String getDescription() {

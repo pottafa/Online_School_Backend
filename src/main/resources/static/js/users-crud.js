@@ -11,12 +11,15 @@ userTableConfig = {
       "columns": [
                           { "data": "id", "sClass": "user_id"  },
                           { "data": "login" , "sClass": "user_login"  },
+                          { "data": "email", "sClass": "user_email" ,
+                                                                                "defaultContent": ""},
                            { "data": "roles", "sClass": "roles" ,
                                                       "defaultContent": ""},
                           { "data": "functions",      "sClass": "functions" ,
                             "defaultContent": "<div class=\"function_buttons\"><ul>" +
                                                         "<li class=\"function_edit\"><a><span>Edit</span></a></li>" +
                                                        "<li class=\"function_delete\"><a><span>Delete</span></a></li>" +
+                                                       "<li class=\"function_send_notification\"><a><span>Send notification</span></a></li>" +
                                                         "</ul></div>"}
                       ],
                       "aoColumnDefs": [
@@ -109,15 +112,20 @@ userTableConfig = {
   }
 
   // Show lightbox
-  function show_lightbox(){
-    $('.lightbox_bg').show();
-    $('.lightbox_container').show();
-  }
-  // Hide lightbox
-  function hide_lightbox(){
-    $('.lightbox_bg').hide();
-    $('.lightbox_container').hide();
-  }
+    function show_lightbox(param){
+      $('.lightbox_bg').show();
+      if (param === 'users') {
+      $('.lightbox_container.users').show();
+      };
+      if (param === 'notification') {
+          $('.lightbox_container.notification').show();
+          };
+    }
+    // Hide lightbox
+    function hide_lightbox(param){
+      $('.lightbox_bg').hide();
+      $('.lightbox_container').hide();
+    }
 
   // Lightbox background
   $(document).on('click', '.lightbox_bg', function(){
@@ -144,8 +152,10 @@ userTableConfig = {
     $('#form_user .field_container label.error').hide();
     $('#form_user .field_container').removeClass('valid').removeClass('error');
     $('#form_user #login').val('');
+    $('#form_user .input_container.password').show();
     $('#form_user #password').val('');
-    show_lightbox();
+    $('#form_user #email').val('');
+    show_lightbox('users');
   });
 
   // Add user submit form
@@ -195,7 +205,9 @@ userTableConfig = {
         $('#form_user .field_container label.error').hide();
         $('#form_user .field_container').removeClass('valid').removeClass('error');
         $('#form_user #login').val($('.user_login', currentRow).text());
-        show_lightbox();
+        $('#form_user .input_container.password').hide();
+        $('#form_user #email').val($('.user_email', currentRow).text());
+        show_lightbox('users');
   });
   
   // Edit user submit form
@@ -256,9 +268,61 @@ userTableConfig = {
     }
   });
 
+
+
+
+  //# ===============================
+  //#        SEND NOTIFICATION TO USER
+  //# ===============================
+
+   // Notification user button
+    $(document).on('click', '.function_send_notification a', function(e){
+      e.preventDefault();
+     var id = $(this).closest('tr').find('.user_id').text();
+       currentRow = $(this).closest('tr');
+          $('#form_notification').attr('data-id', id);
+          $('#form_notification .field_container label.error').hide();
+          $('#form_notification .field_container').removeClass('valid').removeClass('error');
+          $('#form_notification #notification_subject').val('');
+          $('#form_notification #notification_message').val('');
+          show_lightbox('notification');
+    });
+
+    // Create user notification submit form
+    $(document).on('submit', '#form_notification', function(e){
+      e.preventDefault();
+      // Validate form
+        // Send user information to server
+        hide_lightbox();
+        var id  = $('#form_notification').attr('data-id');
+        var notification = {};
+              const form_data = new FormData(document.querySelector('#form_notification'));
+              form_data.forEach(function(value, key){
+                  notification[key] = value;
+              });
+
+        var request   = $.ajax({
+          url:          '/api/users/' + id + '/notifications',
+          cache:        false,
+          data:         JSON.stringify(notification),
+          contentType: "application/json",
+          type:         'POST',
+          success: function () {
+           show_message("Notification was successfully sent to user " + $(this).closest('tr').find('.user_login').text() , 'success');
+                                     table_users.row(currentRow).data(user).draw();
+                               },
+                  error: function (e) {
+                  show_message('Notification request failed: '+ JSON.parse(e), 'error');
+           }
+        });
+    });
+
+
+
 });
 
 
 $(document).on('click', '#refresh_users', function(e){
 $('#table_users').DataTable().ajax.reload();
 });
+

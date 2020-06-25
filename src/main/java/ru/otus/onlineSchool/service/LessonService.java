@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Lesson;
+import ru.otus.onlineSchool.entity.Lesson;
 import ru.otus.onlineSchool.repository.CourseRepository;
+import ru.otus.onlineSchool.repository.LessonRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -17,6 +19,61 @@ public class LessonService {
 
     @Autowired
     private CourseRepository courseRepository;
+    @Autowired
+    private LessonRepository lessonRepository;
+
+
+    public List<Lesson> findLessonByCourse(Long courseId) {
+        return lessonRepository.findByCourse_Id(courseId);
+    }
+
+    public Lesson findLessonById(List<Lesson> lessons, long lessonId) {
+        return lessons.stream()
+                .filter(gr -> gr.getId() == lessonId)
+                .peek(gr -> LOGGER.info("Lesson with id {} was retrieved successfully", lessonId))
+                .findAny()
+                .orElse(null);
+    }
+
+    public Lesson findLessonById(long lessonId) {
+        return lessonRepository.findById(lessonId).orElse(null);
+    }
+
+    @Transactional
+    public Long createLesson(Long courseId, Lesson lesson) {
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if (course == null) {
+            LOGGER.error("Failed create lessonFromDb. Course with id {} not exist", courseId);
+            return null;
+        }
+        lesson.setCourse(course);
+        Long lessonId =  lessonRepository.save(lesson).getId();
+        LOGGER.info("Lesson with id {} was successfully created", lessonId);
+        return lessonId;
+    }
+
+
+    @Transactional
+    public boolean deleteLesson(Long lessonId) {
+        if(lessonRepository.existsById(lessonId)) {
+            lessonRepository.deleteById(lessonId);
+            LOGGER.info("Lesson with id {} was successfully deleted", lessonId);
+            return true;
+        }
+        LOGGER.error("Failed delete lesson with id {}", lessonId);
+        return false;
+    }
+
+
+    @Transactional
+    public Lesson updateLesson(Lesson lesson) {
+        Lesson updatedLesson = lessonRepository.save(lesson);
+        LOGGER.info("Lesson with id {} was successfully updated", updatedLesson.getId());
+        return lesson;
+    }
+
+
+    /*
 
     public Lesson findLessonById(Course course, long lessonId) {
         return course.getLessons().stream()
@@ -27,15 +84,15 @@ public class LessonService {
     }
 
     @Transactional
-    public Long createLesson(Long id, Lesson lesson) {
-        Course course = courseRepository.findById(id).orElse(null);
+    public Long createLesson(Long courseId, Lesson lesson) {
+        Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null) {
-            LOGGER.error("Failed create lesson. Course with id {} not exist", id);
+            LOGGER.error("Failed create lesson. Course with id {} not exist", courseId);
             return null;
         }
         boolean isAdded = course.addLesson(lesson);
         if (!isAdded) {
-            LOGGER.error("Error with adding lesson to course with id {}", id);
+            LOGGER.error("Error with adding lesson to course with id {}", courseId);
             return null;
         }
         Course updatedCourse = courseRepository.save(course);
@@ -87,4 +144,6 @@ Course updatedCourse = courseRepository.save(course);
         LOGGER.info("Lesson with id {} was successfully updated", lessonId);
         return findLessonById(updatedCourse, lessonId);
     }
+
+     */
 }

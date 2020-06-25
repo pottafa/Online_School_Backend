@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
+import ru.otus.onlineSchool.dto.UserMenuItemDTO;
 import ru.otus.onlineSchool.entity.Course;
+import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.service.CourseService;
 
 import java.util.List;
@@ -57,13 +59,15 @@ public class CourseRestController {
         }
     }
 
-    @PutMapping("/api/courses/{id}")
-    public ResponseEntity<?> updateCourse(@PathVariable("id") long id, @RequestBody Course course) {
-        Course updatedCourse = courseService.updateCourse(id, course);
-        if (updatedCourse == null) {
+    @PutMapping("/api/courses/{courseId}")
+    public ResponseEntity<?> updateCourse(@PathVariable("courseId") Long courseId, @RequestBody CourseMenuItemDTO course) {
+        Course courseFromDb = courseService.findCourseById(courseId);
+        if (courseFromDb == null) {
             return ResponseEntity.ok(new ApiError("Failed update course"));
         }
-        return ResponseEntity.ok(modelMapper.map(updatedCourse, CourseMenuItemDTO.class));
+        modelMapper.map(course, courseFromDb);
+        Course updatedCourse = courseService.updateCourse(courseFromDb);
+        return ResponseEntity.ok(updatedCourse);
     }
 
 

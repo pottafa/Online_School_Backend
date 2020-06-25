@@ -1,25 +1,26 @@
 package ru.otus.onlineSchool.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
+import ru.otus.onlineSchool.dto.UserMenuItemDTO;
 import ru.otus.onlineSchool.entity.User;
-import ru.otus.onlineSchool.entity.UserProfile;
-import ru.otus.onlineSchool.repository.FakeUserRepository;
 import ru.otus.onlineSchool.repository.UserRepository;
-import ru.otus.onlineSchool.service.UserService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -28,18 +29,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@SpringBootTest()
-@AutoConfigureMockMvc()
+@ActiveProfiles("test")
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
 class UserRestControllerTest {
     @TestConfiguration
-    static class CourseRestControllerTestContextConfiguration {
-        @Bean
-        @Primary
-        @Scope()
-        public UserRepository fakeWorkChartRepository() {
-            return new FakeUserRepository();
-        }
-
+    static class UserRestControllerTestContextConfiguration {
         @Bean
         @Primary
         public PasswordEncoder bCryptPasswordEncoder() {
@@ -51,50 +48,18 @@ class UserRestControllerTest {
     private MockMvc mvc;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
-    private FakeUserRepository fakeUserRepository;
-
-    @BeforeEach
-    void setUp() {
-        fakeUserRepository.reset();
-    }
+    private ModelMapper modelMapper;
 
     @Test
     void createUserSuccess() throws Exception {
-        User user = new User(10, "test user", "test password");
-        UserProfile userProfile = new UserProfile(10, "TestUser", "testemail@mail.com", 27);
-        user.setProfile(userProfile);
+        User user = new User();
+        user.setLogin("Test login");
+        user.setPassword("test");
 
         String userJson = new ObjectMapper().writeValueAsString(user);
-
-        mvc.perform(post("/api/users")
-                .contentType("application/json")
-                .content(userJson))
-                .andDo(print())
-                .andExpect(content().json("10"))
-                .andExpect(status().isOk());
-
-        User savedUser = userService.findUserById(10);
-        assertThat(savedUser).isNotNull();
-        assertThat(savedUser.getLogin()).isEqualTo("test user");
-        assertThat(savedUser.getId()).isEqualTo(10);
-
-        UserProfile savedProfile = savedUser.getProfile();
-        assertThat(savedProfile).isNotNull();
-        assertThat(savedProfile.getName()).isEqualTo("TestUser");
-        assertThat(savedProfile.getEmail()).isEqualTo("testemail@mail.com");
-        assertThat(savedProfile.getAge()).isEqualTo(27);
-        assertThat(savedProfile.getId()).isEqualTo(10);
-    }
-
-    @Test
-    void createUserErrorMessage() throws Exception {
-        ApiError apiError = new ApiError("Failed create user");
-
-        User userWithExistedId = new User(1, "test user", "test password");
-        String userJson = new ObjectMapper().writeValueAsString(userWithExistedId);
 
         MvcResult result = mvc.perform(post("/api/users")
                 .contentType("application/json")
@@ -103,10 +68,31 @@ class UserRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String response = result.getResponse().getContentAsString();
+        long userId = Long.parseLong(result.getResponse().getContentAsString());
+        User savedUser = userRepository.findById(userId).orElse(null);
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getLogin()).isEqualTo("Test login");
+        assertThat(savedUser.getId()).isNotNull();
+    }
+
+    @Test
+    void createUserErrorMessage() throws Exception {
+        ApiError apiError = new ApiError("Failed create user");
         String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
-        assertThat(response).isNotNull();
-        assertThat(response).isEqualTo(expectedResponse);
+
+        User user = new User();
+        user.setLogin("user with existed id");
+        user.setId(116);
+
+        UserMenuItemDTO userDto = modelMapper.map(user, UserMenuItemDTO.class);
+        String userJson = new ObjectMapper().writeValueAsString(userDto);
+
+        mvc.perform(post("/api/users")
+                .contentType("application/json")
+                .content(userJson))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResponse));
     }
 
     @Test
@@ -117,17 +103,17 @@ class UserRestControllerTest {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$.[?(@.id == 1 && @.login == 'User one' && @.password == 'Password one' )]").exists())
-                .andExpect(jsonPath("$.[?(@.id == 2 && @.login == 'User two' && @.password == 'Password two')]").exists())
-                .andExpect(jsonPath("$.[?(@.id == 3 && @.login == 'User three' && @.password == 'Password three')]").exists());
+                .andExpect(jsonPath("$.[?(@.id == 115 && @.login == 'teacher')]").exists())
+                .andExpect(jsonPath("$.[?(@.id == 116 && @.login == 'student')]").exists())
+                .andExpect(jsonPath("$.[?(@.id == 117 && @.login == 'admin')]").exists());
     }
 
     @Test
     void deleteUserSuccess() throws Exception {
-        long userId = 2;
+        long userId = 116;
 
-        // Проверим, что такой пользователь существует есть
-        User user = userService.findUserById(userId);
+        // Проверим, что такой пользователь есть
+        User user = userRepository.findById(userId).orElse(null);
         assertThat(user).isNotNull();
 
         // Удаляем
@@ -137,42 +123,36 @@ class UserRestControllerTest {
                 .andExpect(status().isOk());
 
         // Проверяем, что удалили
-        User deletedUser = userService.findUserById(userId);
+        User deletedUser = userRepository.findById(userId).orElse(null);
         assertThat(deletedUser).isNull();
     }
 
     @Test
     void deleteUserErrorMessage() throws Exception {
         ApiError apiError = new ApiError("Failed delete user");
+        String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
         long notExistedUserId = 10;
 
-        MvcResult result = mvc.perform(delete("/api/users/" + notExistedUserId)
+        mvc.perform(delete("/api/users/" + notExistedUserId)
                 .contentType("application/json"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn();
-
-        String response = result.getResponse().getContentAsString();
-        String expectedResult = new ObjectMapper().writeValueAsString(apiError);
-        assertThat(response).isNotNull();
-        assertThat(response).isEqualTo(expectedResult);
-
+                .andExpect(content().json(expectedResponse));
     }
 
     @Test
     void updateUserSuccess() throws Exception {
-        long userId = 3;
+        long userId = 116;
 
         // Проверим, что было в начале
-        User user = userService.findUserById(userId);
+        User user = userRepository.findById(userId).orElse(null);
         assertThat(user).isNotNull();
-        assertThat(user.getLogin()).isEqualTo("User three");
-        assertThat(user.getProfile()).isNull();
-
+        assertThat(user.getLogin()).isEqualTo("student");
         // Обновляем, сохраняем
-        user.setLogin("User three Updated login");
-        user.setProfile(new UserProfile());
-        String userJson = new ObjectMapper().writeValueAsString(user);
+        user.setLogin("student Updated Login");
+
+        UserMenuItemDTO userDto = modelMapper.map(user, UserMenuItemDTO.class);
+        String userJson = new ObjectMapper().writeValueAsString(userDto);
         mvc.perform(put("/api/users/" + userId)
                 .contentType("application/json")
                 .content(userJson))
@@ -180,69 +160,58 @@ class UserRestControllerTest {
                 .andExpect(status().isOk());
 
         // Проверяем, что сохранилось
-        User updatedUser = userService.findUserById(userId);
+        User updatedUser = userRepository.findById(userId).orElse(null);
         assertThat(updatedUser).isNotNull();
-        assertThat(updatedUser.getLogin()).isEqualTo("User three Updated login");
-        assertThat(updatedUser.getProfile()).isNotNull();
+        assertThat(user.getLogin()).isEqualTo("student Updated Login");
     }
 
     @Test
     void updateUserErrorMessage() throws Exception {
         ApiError apiError = new ApiError("Failed update user");
-        long userId = 3;
+        String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
+        long userId = 116;
 
         // Проверим, что было в начале
-        User user = userService.findUserById(userId);
+        User user = userRepository.findById(userId).orElse(null);
         assertThat(user).isNotNull();
-        assertThat(user.getLogin()).isEqualTo("User three");
-        assertThat(user.getProfile()).isNull();
+        assertThat(user.getLogin()).isEqualTo("student");
 
-        // Удалим пользователя
-        userService.deleteUser(userId);
+        // Удалим пользователь
+        userRepository.deleteById(userId);
 
         // Обновляем, сохраняем
-        user.setLogin("User three Updated login");
-        user.setProfile(new UserProfile());
-        String userJson = new ObjectMapper().writeValueAsString(user);
+        user.setLogin("Updated Login");
 
-        MvcResult result = mvc.perform(put("/api/users/" + userId)
+        UserMenuItemDTO userDto = modelMapper.map(user, UserMenuItemDTO.class);
+        String userJson = new ObjectMapper().writeValueAsString(userDto);
+
+        mvc.perform(put("/api/users/" + userId)
                 .contentType("application/json")
                 .content(userJson))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn();
-
-        String response = result.getResponse().getContentAsString();
-        String expectedResult = new ObjectMapper().writeValueAsString(apiError);
-        assertThat(response).isNotNull();
-        assertThat(response).isEqualTo(expectedResult);
+                .andExpect(content().json(expectedResponse));
     }
 
     @Test
     public void getUserSuccess() throws Exception {
-        mvc.perform(get("/api/users/2"))
+        mvc.perform(get("/api/users/116"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.id").value(2))
-                .andExpect(jsonPath("$.login").value("User two"));
+                .andExpect(jsonPath("$.id").value(116))
+                .andExpect(jsonPath("$.login").value("student"));
     }
 
     @Test
     public void getUserErrorMessage() throws Exception {
         ApiError apiError = new ApiError("Failed get user");
+        String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
         long userId = 10;
 
-        MvcResult result = mvc.perform(get("/api/users/" + userId))
+        mvc.perform(get("/api/users/" + userId))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn();
-
-        String response = result.getResponse().getContentAsString();
-        String expectedResult = new ObjectMapper().writeValueAsString(apiError);
-        assertThat(response).isNotNull();
-        assertThat(response).isEqualTo(expectedResult);
+                .andExpect(content().json(expectedResponse));
     }
-
-
 }

@@ -1,44 +1,50 @@
 package ru.otus.onlineSchool.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
+import ru.otus.onlineSchool.dto.GroupMenuItemDTO;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Group;
+import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.CourseRepository;
-import ru.otus.onlineSchool.repository.FakeCourseRepository;
-import ru.otus.onlineSchool.service.CourseService;
+import ru.otus.onlineSchool.repository.GroupRepository;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@SpringBootTest()
-@AutoConfigureMockMvc()
+@ActiveProfiles("test")
+@ExtendWith(SpringExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
 class GroupRestControllerTest {
     @TestConfiguration
     static class GroupRestControllerTestContextConfiguration {
-        @Bean
-        @Primary
-        @Scope()
-        public CourseRepository fakeWorkChartRepository() {
-            return new FakeCourseRepository();
-        }
-
         @Bean
         @Primary
         public PasswordEncoder bCryptPasswordEncoder() {
@@ -47,47 +53,57 @@ class GroupRestControllerTest {
     }
 
     @Autowired
-    private MockMvc mvc;
-    @Autowired
-    private CourseService courseService;
-    @Autowired
-    private FakeCourseRepository fakeCourseRepository;
+    private GroupRepository groupRepository;
 
-    @BeforeEach
-    void setUp() {
-        fakeCourseRepository.reset();
-    }
+    @Autowired
+    private CourseRepository courseRepository;
+
+    @Autowired
+    private MockMvc mvc;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Test
     void createGroupSuccess() throws Exception {
-        Group group = new Group(10, "created test group");
-        long courseId = 2L;
+        Long courseId = 103L;
+        Course courseFromDb = courseRepository.findById(courseId).orElse(null);
+
+        Group group = new Group();
+        group.setTitle("created test group");
+        group.setCourse(courseFromDb);
+
         String groupJson = new ObjectMapper().writeValueAsString(group);
 
-        mvc.perform(post("/api/courses/" + courseId + "/groups")
+        MvcResult result = mvc.perform(post("/api/courses/" + courseId + "/groups")
                 .contentType("application/json")
                 .content(groupJson))
                 .andDo(print())
-                .andExpect(content().json("10"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
 
-        Course courseWithSavedGroup = courseService.findCourseById(courseId);
-        Group savedGroup = findGroupById(courseWithSavedGroup, group.getId());
+        Long groupId = Long.parseLong(result.getResponse().getContentAsString());
+        Group savedGroup = groupRepository.findById(groupId).orElse(null);
         assertThat(savedGroup).isNotNull();
+        assertThat(savedGroup.getId()).isNotNull();
         assertThat(savedGroup.getTitle()).isEqualTo("created test group");
-        assertThat(savedGroup.getId()).isEqualTo(10);
+
     }
 
     @Test
     void createGroupErrorMessage() throws Exception {
+        Long notExistCourseId = 55L;
+
         ApiError apiError = new ApiError("Failed create group");
         String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
 
-        Group group = new Group(1, "created test group");
-        long courseId = 1L;
+        Group group = new Group();
+        group.setTitle("Test title");
+        group.setCourse(null);
+
         String groupJson = new ObjectMapper().writeValueAsString(group);
 
-        mvc.perform(post("/api/courses/" + courseId + "/groups")
+        mvc.perform(post("/api/courses/" + notExistCourseId + "/groups")
                 .contentType("application/json")
                 .content(groupJson))
                 .andDo(print())
@@ -97,26 +113,25 @@ class GroupRestControllerTest {
 
     @Test
     public void getAllGroupsSuccess() throws Exception {
-        long courseId = 1;
+        long courseId = 103;
         mvc.perform(get("/api/courses/" + courseId + "/groups"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$.[?(@.id == 1 && @.title == 'Group one')]").exists())
-                .andExpect(jsonPath("$.[?(@.id == 2 && @.title == 'Group two')]").exists());
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$.[?(@.id == 114 && @.title == 'First group')]").exists())
+                .andExpect(jsonPath("$.[?(@.id == 118 && @.title == 'Second group')]").exists())
+                .andExpect(jsonPath("$.[?(@.id == 119 && @.title == 'Third group')]").exists());
     }
 
     @Test
     void deleteGroupSuccess() throws Exception {
-        long courseId = 1;
-        long groupId = 2;
+        long courseId = 103;
+        long groupId = 114;
 
         // Проверим, что такая группа есть
-        Course course = courseService.findCourseById(courseId);
-        assertThat(course).isNotNull();
-        Group group = findGroupById(course, groupId);
+        Group group = groupRepository.findById(groupId).orElse(null);
         assertThat(group).isNotNull();
 
         // Удаляем
@@ -126,8 +141,7 @@ class GroupRestControllerTest {
                 .andExpect(status().isOk());
 
         // Проверяем, что удалили
-        Course updatedCourse = courseService.findCourseById(courseId);
-        Group deletedGroup = findGroupById(updatedCourse, groupId);
+        Group deletedGroup = groupRepository.findById(groupId).orElse(null);
         assertThat(deletedGroup).isNull();
     }
 
@@ -136,8 +150,8 @@ class GroupRestControllerTest {
         ApiError apiError = new ApiError("Failed delete group");
         String expectedResult = new ObjectMapper().writeValueAsString(apiError);
 
-        long courseId = 10;
-        long notExistedGroupId = 10;
+        long courseId = 103;
+        long notExistedGroupId = 200;
 
         mvc.perform(delete("/api/courses/" + courseId + "/groups/" + notExistedGroupId)
                 .contentType("application/json"))
@@ -148,18 +162,19 @@ class GroupRestControllerTest {
 
     @Test
     void updateGroupSuccess() throws Exception {
-        long courseId = 1;
-        long groupId = 1;
+        long courseId = 103;
+        long groupId = 114;
 
-        Course course = courseService.findCourseById(courseId);
-        Group group = findGroupById(course, groupId);
+
+        Group group = groupRepository.findById(groupId).orElse(null);
         assertThat(group).isNotNull();
-        assertThat(group.getTitle()).isEqualTo("Group one");
+        assertThat(group.getTitle()).isEqualTo("First group");
 
         // Обновляем, сохраняем
-        group.setTitle("Group one Updated Title");
+        group.setTitle("First group Updated Title");
 
-        String groupJson = new ObjectMapper().writeValueAsString(group);
+        GroupMenuItemDTO groupDto = modelMapper.map(group, GroupMenuItemDTO.class);
+        String groupJson = new ObjectMapper().writeValueAsString(groupDto);
         mvc.perform(put("/api/courses/" + courseId + "/groups/" + groupId)
                 .contentType("application/json")
                 .content(groupJson))
@@ -167,31 +182,32 @@ class GroupRestControllerTest {
                 .andExpect(status().isOk());
 
         // Проверяем, что сохранилось
-        Course updatedCourse = courseService.findCourseById(courseId);
-        Group updatedGroup = findGroupById(updatedCourse, groupId);
+        Group updatedGroup = groupRepository.findById(groupId).orElse(null);
         assertThat(updatedGroup).isNotNull();
-        assertThat(updatedGroup.getTitle()).isEqualTo("Group one Updated Title");
+        assertThat(updatedGroup.getTitle()).isEqualTo("First group Updated Title");
     }
+
 
     @Test
     void updateGroupErrorMessage() throws Exception {
         ApiError apiError = new ApiError("Failed update group");
         String expectedResult = new ObjectMapper().writeValueAsString(apiError);
 
-        long courseId = 1;
-        long groupId = 1;
+        long courseId = 103;
+        long groupId = 114;
 
-        Course course = courseService.findCourseById(courseId);
-        Group group = findGroupById(course, groupId);
+        Group group = groupRepository.findById(groupId).orElse(null);
         assertThat(group).isNotNull();
-        assertThat(group.getTitle()).isEqualTo("Group one");
+        assertThat(group.getTitle()).isEqualTo("First group");
 
         // Удалим группу
-        course.removeGroup(group);
+        groupRepository.deleteById(groupId);
 
         // Обновляем, сохраняем
-        group.setTitle("Group one Updated Title");
-        String groupJson = new ObjectMapper().writeValueAsString(group);
+        group.setTitle("First group Updated Title");
+
+        GroupMenuItemDTO groupDto = modelMapper.map(group, GroupMenuItemDTO.class);
+        String groupJson = new ObjectMapper().writeValueAsString(groupDto);
 
         mvc.perform(put("/api/courses/" + courseId + "/groups/" + groupId)
                 .contentType("application/json")
@@ -203,14 +219,14 @@ class GroupRestControllerTest {
 
     @Test
     public void getGroupSuccess() throws Exception {
-        long courseId = 1;
-        long groupId = 1;
+        long courseId = 103;
+        long groupId = 114;
         mvc.perform(get("/api/courses/" + courseId + "/groups/" + groupId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.title").value("Group one"));
+                .andExpect(jsonPath("$.id").value(114))
+                .andExpect(jsonPath("$.title").value("First group"));
     }
 
     @Test
@@ -218,19 +234,99 @@ class GroupRestControllerTest {
         ApiError apiError = new ApiError("Failed get group");
         String expectedResult = new ObjectMapper().writeValueAsString(apiError);
 
-        long courseId = 1;
-        long groupId = 10;
+        long courseId = 103;
+        long groupId = 200;
         mvc.perform(get("/api/courses/" + courseId + "/groups/" + groupId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().json(expectedResult));
     }
 
+    @Test
+    void addUsersToTheGroupSuccess() throws Exception {
 
-    private Group findGroupById(Course course, long groupId) {
-        return course.getGroups().stream()
-                .filter(gr -> gr.getId() == groupId)
-                .findFirst()
-                .orElse(null);
+        Long courseId = 103L;
+        Long groupId = 114L;
+        List<Long> usersIds = Arrays.asList(115L, 116L);
+
+        String usersIdsJson = new ObjectMapper().writeValueAsString(usersIds);
+
+        mvc.perform(put("/api/courses/" + courseId + "/groups/" + groupId + "/users")
+                .contentType("application/json")
+                .content(usersIdsJson))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        Group group = groupRepository.findById(groupId).orElse(null);
+        assertThat(group).isNotNull();
+        List<User> users = group.getUsers();
+        assertThat(users).isNotNull();
+        User user1 = users.get(0);
+        assertThat(user1.getId()).isEqualTo(115);
+        User user2 = users.get(1);
+        assertThat(user2.getId()).isEqualTo(116);
+
     }
+
+
+    @Test
+    void addUsersToTheGroupErrorMessage() throws Exception {
+        ApiError apiError = new ApiError("Failed add users to the group");
+        String expectedResult = new ObjectMapper().writeValueAsString(apiError);
+
+        Long courseId = 103L;
+        Long groupId = 1111L;
+        List<Long> usersIds = Arrays.asList(115L, 116L);
+
+        String usersIdsJson = new ObjectMapper().writeValueAsString(usersIds);
+
+        mvc.perform(put("/api/courses/" + courseId + "/groups/" + groupId + "/users")
+                .contentType("application/json")
+                .content(usersIdsJson))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedResult));
+    }
+
+
+    @Test
+    void getUsersToTheGroupSuccess() throws Exception {
+        Long courseId = 103L;
+        Long groupId = 114L;
+
+        List<Long> usersIds = Arrays.asList(115L, 116L);
+
+        String usersIdsJson = new ObjectMapper().writeValueAsString(usersIds);
+
+        mvc.perform(put("/api/courses/" + courseId + "/groups/" + groupId + "/users")
+                .contentType("application/json")
+                .content(usersIdsJson))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/api/courses/" + courseId + "/groups/" + groupId + "/users"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.[?(@.id == 115 && @.login == 'teacher')]").exists())
+                .andExpect(jsonPath("$.[?(@.id == 116 && @.login == 'student')]").exists());
+
+    }
+
+    @Test
+    void getUsersFromTheGroupErrorMessage() throws Exception {
+        ApiError apiError = new ApiError("Failed get users from the group");
+        String expectedResult = new ObjectMapper().writeValueAsString(apiError);
+
+        Long courseId = 103L;
+        Long groupId = 111111L;
+
+        mvc.perform(get("/api/courses/" + courseId + "/groups/" + groupId + "/users"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(content().json(expectedResult));
+
+    }
+
 }

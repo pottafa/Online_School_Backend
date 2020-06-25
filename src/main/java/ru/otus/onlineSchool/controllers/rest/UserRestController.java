@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
 import ru.otus.onlineSchool.dto.UserMenuItemDTO;
+import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.entity.User;
+import ru.otus.onlineSchool.notification.EmailService;
 import ru.otus.onlineSchool.service.UserService;
 
 import java.util.List;
@@ -57,14 +59,15 @@ public class UserRestController {
         }
     }
 
-    @PutMapping("/api/users/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable("id") Long id, @RequestBody User user) {
-        User updatedUser = userService.updateUser(user);
-        if (updatedUser != null) {
-            return ResponseEntity.ok(updatedUser);
-        } else {
+    @PutMapping("/api/users/{userId}")
+    public ResponseEntity<?> updateUser(@PathVariable("userId") Long userId, @RequestBody UserMenuItemDTO user) {
+        User userFromDb = userService.findUserById(userId);
+        if (userFromDb == null) {
             return ResponseEntity.ok(new ApiError("Failed update user"));
         }
+        modelMapper.map(user, userFromDb);
+        User updatedUser = userService.updateUser(userFromDb);
+        return ResponseEntity.ok(updatedUser);
     }
 
 }
