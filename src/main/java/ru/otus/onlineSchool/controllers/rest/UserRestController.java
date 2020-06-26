@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
 import ru.otus.onlineSchool.dto.UserMenuItemDTO;
+import ru.otus.onlineSchool.dto.UserMenuView;
 import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.notification.EmailService;
@@ -43,9 +44,7 @@ public class UserRestController {
 
     @GetMapping("/api/users")
     public ResponseEntity<?> getUsers() {
-        List<UserMenuItemDTO> users = userService.findAllUsers().stream()
-                .map(user -> modelMapper.map(user, UserMenuItemDTO.class))
-                .collect(Collectors.toList());
+        List<UserMenuView> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
     }
 

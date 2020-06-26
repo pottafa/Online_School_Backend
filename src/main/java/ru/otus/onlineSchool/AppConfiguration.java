@@ -23,7 +23,7 @@ public class AppConfiguration {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
-        mapper.addMappings(new PropertyMap<Group, GroupMenuItemDTO>() {
+     mapper.addMappings(new PropertyMap<Group, GroupMenuItemDTO>() {
             protected void configure() {
                 map().setUsersCount(source.getUsers().size());
             }

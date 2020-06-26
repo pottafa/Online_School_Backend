@@ -5,6 +5,14 @@ public class GroupMenuItemDTO {
    private String title;
    private int usersCount;
 
+    public GroupMenuItemDTO() {
+    }
+
+    public GroupMenuItemDTO(long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
+
     public long getId() {
         return id;
     }
@@ -28,4 +36,5 @@ public class GroupMenuItemDTO {
     public void setUsersCount(int usersCount) {
         this.usersCount = usersCount;
     }
+
 }

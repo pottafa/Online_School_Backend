@@ -13,7 +13,7 @@ userTableConfig = {
                           { "data": "login" , "sClass": "user_login"  },
                           { "data": "email", "sClass": "user_email" ,
                                                                                 "defaultContent": ""},
-                           { "data": "roles", "sClass": "roles" ,
+                           { "data": "roles[, ].name", "sClass": "roles" ,
                                                       "defaultContent": ""},
                           { "data": "functions",      "sClass": "functions" ,
                             "defaultContent": "<div class=\"function_buttons\"><ul>" +

@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
-import ru.otus.onlineSchool.dto.UserMenuItemDTO;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.repository.CourseRepository;
 
@@ -62,7 +61,7 @@ class CourseRestControllerTest {
         CourseMenuItemDTO courseDto = modelMapper.map(course, CourseMenuItemDTO.class);
         String courseJson = new ObjectMapper().writeValueAsString(courseDto);
 
-      MvcResult result = mvc.perform(post("/api/courses")
+        MvcResult result = mvc.perform(post("/api/courses")
                 .contentType("application/json")
                 .content(courseJson))
                 .andDo(print())

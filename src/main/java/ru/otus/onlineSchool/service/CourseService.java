@@ -5,11 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.otus.onlineSchool.entity.Course;
-import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.CourseRepository;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,10 +34,8 @@ public class CourseService {
         return null;
     }
 
-    public List<Course> findAllCourses() {
-        List<Course> courses = new ArrayList<>();
-        courseRepository.findAll().forEach(courses::add);
-        return courses;
+    public <T> List<T> findAllCourses(Class<T> type) {
+        return courseRepository.findAllBy(type);
     }
 
     public Course findCourseById(long courseId) {

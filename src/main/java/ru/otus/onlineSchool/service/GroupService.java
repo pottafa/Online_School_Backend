@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.otus.onlineSchool.dto.GroupMenuItemDTO;
+import ru.otus.onlineSchool.dto.GroupMenuView;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.entity.User;
@@ -27,8 +29,8 @@ public class GroupService {
     @Autowired
     private GroupRepository groupRepository;
 
-    public List<Group> findGroupByCourse(Long courseId) {
-return groupRepository.findByCourse_Id(courseId);
+    public <T> List<T> findGroupByCourse(Long courseId, Class<T> type) {
+return groupRepository.findByCourse_Id(courseId, type);
     }
 
     public Group findGroupById(List<Group> groups, long groupId) {

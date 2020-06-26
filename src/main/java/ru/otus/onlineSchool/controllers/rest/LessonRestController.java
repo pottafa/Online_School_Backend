@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.dto.LessonMenuItemDTO;
+import ru.otus.onlineSchool.dto.LessonMenuView;
 import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.entity.Lesson;
 import ru.otus.onlineSchool.service.LessonService;
@@ -33,11 +34,8 @@ public class LessonRestController {
 
     @GetMapping("/api/courses/{id}/lessons")
     public ResponseEntity<?> getLessons(@PathVariable("id") long id) {
-        List<Lesson> lessons = lessonService.findLessonByCourse(id);
+        List<LessonMenuView> lessons = lessonService.findLessonByCourse(id, LessonMenuView.class);
         if (lessons != null) {
-            List<LessonMenuItemDTO> lessonsDto = lessons.stream()
-                    .map(lesson -> modelMapper.map(lesson, LessonMenuItemDTO.class))
-                    .collect(Collectors.toList());
             return ResponseEntity.ok(lessons);
         } else {
             return ResponseEntity.ok(new ApiError("Failed get lessons"));

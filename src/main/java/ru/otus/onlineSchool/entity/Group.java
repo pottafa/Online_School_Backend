@@ -75,15 +75,4 @@ public class Group implements Serializable {
         this.title = title;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Group)) return false;
-        return id != null && id.equals(((Group) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return 11;
-    }
 }

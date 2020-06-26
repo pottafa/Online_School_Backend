@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.otus.onlineSchool.dto.LessonMenuView;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Lesson;
 import ru.otus.onlineSchool.entity.Lesson;
@@ -23,8 +24,8 @@ public class LessonService {
     private LessonRepository lessonRepository;
 
 
-    public List<Lesson> findLessonByCourse(Long courseId) {
-        return lessonRepository.findByCourse_Id(courseId);
+    public <T> List<T> findLessonByCourse(Long courseId, Class<T> type) {
+        return lessonRepository.findByCourse_Id(courseId, type);
     }
 
     public Lesson findLessonById(List<Lesson> lessons, long lessonId) {

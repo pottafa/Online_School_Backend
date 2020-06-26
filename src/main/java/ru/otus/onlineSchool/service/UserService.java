@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.otus.onlineSchool.dto.UserMenuView;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.entity.User;
@@ -48,10 +49,8 @@ public class UserService {
         return id;
     }
 
-    public List<User> findAllUsers() {
-        List<User> users = new ArrayList<>();
-        userRepository.findAll().forEach(users::add);
-        return users;
+    public List<UserMenuView> findAllUsers() {
+       return userRepository.findAllBy();
     }
 
 
