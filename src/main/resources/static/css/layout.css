@@ -298,6 +298,7 @@ table.datatable td,table.datatable th {
 }
 
 table.datatable tbody td.functions .function_buttons ul {
+    width: 250px;
     margin: 0;
     padding: 4px
 }
@@ -349,7 +350,7 @@ table.datatable tbody td.functions .function_buttons {
 
 table.datatable tbody td.functions .function_buttons li {
     float: left;
-    padding: 0 10px 0 0
+    padding: 0 10px 0 10px
 }
 
 table.datatable tbody td.functions .function_buttons li.function_delete {
@@ -374,6 +375,10 @@ table.datatable tbody td.functions .function_buttons a {
 table.datatable tbody td.functions .function_buttons .function_edit a:before {
     font-size: 1.1rem;
     content: "\f040"
+}
+table.datatable tbody td.functions .function_buttons .function_send_notification a:before {
+    font-size: 1.1rem;
+    content: "\f0e0"
 }
 table.datatable tbody td.functions .function_buttons .function_manage_users a:before {
     font-size: 1.1rem;

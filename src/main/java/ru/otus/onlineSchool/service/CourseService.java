@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.otus.onlineSchool.dto.CourseStatisticsDTO;
+import ru.otus.onlineSchool.dto.CourseStatisticsView;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.repository.CourseRepository;
 
@@ -78,6 +80,11 @@ public class CourseService {
         Course updatedCourse = courseRepository.save(course);
         LOGGER.info("Course with id {} was successfully updated", updatedCourse.getId());
         return updatedCourse;
+    }
+
+
+    public List<CourseStatisticsView> findAllCourses() {
+        return courseRepository.getCourseStatistics();
     }
 
 }

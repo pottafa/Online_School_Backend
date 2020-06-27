@@ -18,6 +18,7 @@ public class Lesson {
     @Column(name = "description")
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)
     @JsonBackReference
     private Course course;
 

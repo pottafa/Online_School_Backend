@@ -28,11 +28,11 @@ public class AppConfiguration {
                 map().setUsersCount(source.getUsers().size());
             }
         });
-        mapper.addMappings(new PropertyMap<User, UserMenuItemDTO>() {
-            protected void configure() {
-                map().setRoles(source.getRoles().toString());
-            }
-        });
+     //   mapper.addMappings(new PropertyMap<User, UserMenuItemDTO>() {
+      //      protected void configure() {
+     //           map().setRoles(source.getRoles().toString());
+    //        }
+     //   });
         mapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.STRICT)
                 .setFieldMatchingEnabled(true)
@@ -41,21 +41,4 @@ public class AppConfiguration {
         return mapper;
     }
 
-    @Bean
-    public JavaMailSender getJavaMailSender(@Value("${email_address}") String emailAddress, @Value("${email_password}") String password) {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587);
-
-        mailSender.setUsername(emailAddress);
-        mailSender.setPassword(password);
-
-        Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
-
-        return mailSender;
-    }
 }

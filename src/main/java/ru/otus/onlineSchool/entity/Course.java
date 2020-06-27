@@ -10,6 +10,7 @@ import javax.persistence.*;
 public class Course {
 
     @Id
+    @Column(name = "course_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
     @Column(name = "title")

@@ -24,8 +24,6 @@ public class User implements Serializable, UserDetails {
     private String login;
     @Column(name = "password")
     private String password;
-    @Column(name = "email")
-    private String email;
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
@@ -37,14 +35,6 @@ public class User implements Serializable, UserDetails {
     public User() {
     }
 
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public void setId(long id) {
         this.id = id;

@@ -5,16 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
-import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
+
 import ru.otus.onlineSchool.dto.UserMenuItemDTO;
-import ru.otus.onlineSchool.dto.UserMenuView;
-import ru.otus.onlineSchool.entity.Group;
+
+
 import ru.otus.onlineSchool.entity.User;
-import ru.otus.onlineSchool.notification.EmailService;
+
 import ru.otus.onlineSchool.service.UserService;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 public class UserRestController {
@@ -44,7 +44,7 @@ public class UserRestController {
 
     @GetMapping("/api/users")
     public ResponseEntity<?> getUsers() {
-        List<UserMenuView> users = userService.findAllUsers();
+        List<UserMenuItemDTO> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
     }
 

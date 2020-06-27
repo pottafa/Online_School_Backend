@@ -5,16 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.otus.onlineSchool.dto.UserMenuView;
-import ru.otus.onlineSchool.entity.Course;
-import ru.otus.onlineSchool.entity.Group;
+import ru.otus.onlineSchool.dto.UserMenuItemDTO;
+
 import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.UserRepository;
 
-import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class UserService {
@@ -49,9 +46,14 @@ public class UserService {
         return id;
     }
 
-    public List<UserMenuView> findAllUsers() {
-       return userRepository.findAllBy();
+    public List<UserMenuItemDTO> findAllUsers() {
+       return userRepository.findAllDTOBy();
     }
+
+    public String findUserEmail(Long userId) {
+        return userRepository.findUserEmail(userId);
+    }
+
 
 
     public boolean deleteUser(Long userId) {

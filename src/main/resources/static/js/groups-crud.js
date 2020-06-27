@@ -18,6 +18,7 @@ var currentRow;
                               "defaultContent": "<div class=\"function_buttons\"><ul>" +
                                                           "<li class=\"function_edit\"><a><span>Edit</span></a></li>" +
                                                          "<li class=\"function_delete\"><a><span>Delete</span></a></li>" +
+                                                         "<li class=\"function_send_notification\"><a><span>Send notification</span></a></li>" +
                                                           "</ul></div>"},
                              { "data": "manageUsers",      "sClass": "functions" ,
                                                           "defaultContent": "<div class=\"function_buttons\"><ul>" +
@@ -108,6 +109,9 @@ var currentRow;
     if (param === 'group') {
     $('.lightbox_container.group').show();
     };
+    if (param === 'notification') {
+        $('.lightbox_container.notification').show();
+        };
     if (param === 'users_management') {
         $('.lightbox_container.user_management').show();
         };
@@ -352,4 +356,54 @@ if (typeof filter_group_list !== 'undefined' && filter_group_list.length > 0) {
   		});
 
 
-});
+
+
+ //# ===============================
+ //#        SEND NOTIFICATION TO GROUP
+ //# ===============================
+
+           // Notification user button
+            $(document).on('click', '.function_send_notification a', function(e){
+              e.preventDefault();
+             var group_id = $(this).closest('tr').find('.group_id').text();
+                  $('#form_notification').attr('data-id', group_id);
+                  $('#form_notification .field_container label.error').hide();
+                  $('#form_notification .field_container').removeClass('valid').removeClass('error');
+                  $('#form_notification #notification_subject').val('');
+                  $('#form_notification #notification_message').val('');
+                  show_lightbox('notification');
+            });
+
+            // Create user notification submit form
+            $(document).on('submit', '#form_notification', function(e){
+              e.preventDefault();
+                // Send user information to server
+                hide_lightbox();
+                var group_id  = $('#form_notification').attr('data-id');
+                var notification = {};
+                      const form_data = new FormData(document.querySelector('#form_notification'));
+                      form_data.forEach(function(value, key){
+                          notification[key] = value;
+                      });
+
+                var request   = $.ajax({
+                  url:          '/api/courses/' + course_id + '/groups/' + group_id + '/notifications',
+                  cache:        false,
+                  data:         JSON.stringify(notification),
+                  contentType: "application/json",
+                  type:         'POST',
+                  success: function () {
+                   show_message("Notification was successfully sent to group with id " + group_id , 'success');
+                                             table_users.row(currentRow).data(user).draw();
+                                       },
+                          error: function (e) {
+                          show_message('Notification request failed: '+ JSON.parse(e), 'error');
+                   }
+                });
+            });
+
+
+
+        });
+
+

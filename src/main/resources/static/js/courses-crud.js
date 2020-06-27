@@ -100,12 +100,14 @@ var currentRow;
     $('#message').html('').attr('class', '');
     $('#message_container').hide();
   }
+   // Show lightbox
+      function show_lightbox(param){
+        $('.lightbox_bg').show();
+        if (param === 'courses') {
+        $('#courses_lightbox').show();
+        };
+      }
 
-  // Show lightbox
-  function show_lightbox(){
-    $('.lightbox_bg').show();
-    $('.lightbox_container').show();
-  }
   // Hide lightbox
   function hide_lightbox(){
     $('.lightbox_bg').hide();
@@ -138,7 +140,7 @@ var currentRow;
     $('#form_course .field_container').removeClass('valid').removeClass('error');
     $('#form_course #title').val('');
     $('#form_course #description').val('');
-    show_lightbox();
+    show_lightbox('courses');
   });
 
   // Add course submit form
@@ -181,7 +183,7 @@ var currentRow;
     e.preventDefault();
     var id      = $(this).closest('tr').find('.course_id').text();
      currentRow = $(this).closest('tr');
-        $('.lightbox_content h2').text('Edit course');
+        $('#courses_lightbox h2').text('Edit course');
         $('#form_course button').text('Edit course');
         $('#form_course').attr('class', 'form edit');
         $('#form_course').attr('data-id', id);
@@ -189,7 +191,7 @@ var currentRow;
         $('#form_course .field_container').removeClass('valid').removeClass('error');
         $('#form_course #title').val($('.course_title', currentRow).text());
         $('#form_course #description').val($('.course_description', currentRow).text());
-        show_lightbox();
+        show_lightbox('courses');
   });
   
   // Edit course submit form
@@ -254,6 +256,11 @@ var currentRow;
  $(document).on('click', '#refresh_courses', function(e){
  $('#table_courses').DataTable().ajax.reload();
  });
+
+ $(document).on('click', '#courses_statistics', function(e){
+   window.location.href = "/admin-panel/statistics/courses";
+    return true;
+  });
 
 
 

@@ -11,10 +11,6 @@ userTableConfig = {
       "columns": [
                           { "data": "id", "sClass": "user_id"  },
                           { "data": "login" , "sClass": "user_login"  },
-                          { "data": "email", "sClass": "user_email" ,
-                                                                                "defaultContent": ""},
-                           { "data": "roles[, ].name", "sClass": "roles" ,
-                                                      "defaultContent": ""},
                           { "data": "functions",      "sClass": "functions" ,
                             "defaultContent": "<div class=\"function_buttons\"><ul>" +
                                                         "<li class=\"function_edit\"><a><span>Edit</span></a></li>" +
@@ -115,7 +111,7 @@ userTableConfig = {
     function show_lightbox(param){
       $('.lightbox_bg').show();
       if (param === 'users') {
-      $('.lightbox_container.users').show();
+      $('#users_lightbox').show();
       };
       if (param === 'notification') {
           $('.lightbox_container.notification').show();
@@ -198,7 +194,7 @@ userTableConfig = {
     e.preventDefault();
     var id      = $(this).closest('tr').find('.user_id').text();
      currentRow = $(this).closest('tr');
-        $('.lightbox_content h2').text('Edit user');
+        $('#users_lightbox h2').text('Edit user');
         $('#form_user button').text('Edit user');
         $('#form_user').attr('class', 'form edit');
         $('#form_user').attr('data-id', id);
@@ -291,7 +287,6 @@ userTableConfig = {
     // Create user notification submit form
     $(document).on('submit', '#form_notification', function(e){
       e.preventDefault();
-      // Validate form
         // Send user information to server
         hide_lightbox();
         var id  = $('#form_notification').attr('data-id');
