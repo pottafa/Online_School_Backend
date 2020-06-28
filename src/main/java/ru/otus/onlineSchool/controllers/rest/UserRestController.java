@@ -35,8 +35,7 @@ public class UserRestController {
     }
 
     @PostMapping("/api/users")
-    public ResponseEntity<?> createUser(@RequestBody UserMenuItemDTO userMenuItemDTO) {
-        User user = modelMapper.map(userMenuItemDTO, User.class);
+    public ResponseEntity<?> createUser(@RequestBody User user) {
         Long id = userService.createUser(user);
         if (id != null) return ResponseEntity.ok(id);
         else return ResponseEntity.ok(new ApiError("Failed create user"));

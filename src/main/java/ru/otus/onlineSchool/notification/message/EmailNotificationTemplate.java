@@ -1,14 +1,12 @@
 package ru.otus.onlineSchool.notification.message;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+
 
 public class EmailNotificationTemplate {
     private String subject;
     private String message;
-    private Date date;
+    private String date;
 
     public String getSubject() {
         return subject;
@@ -26,12 +24,11 @@ public class EmailNotificationTemplate {
         this.message = message;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(String date) throws ParseException {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm");
-        this.date = formatter.parse(date);
+    public void setDate(String date) {
+        this.date = date;
     }
 }

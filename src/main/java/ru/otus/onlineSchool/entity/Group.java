@@ -1,6 +1,8 @@
 package ru.otus.onlineSchool.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -12,6 +14,7 @@ import java.util.List;
 @Table(name = "groups")
 public class Group implements Serializable {
     @Id
+    @Column(name = "group_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     @Column(name = "title", unique = true)
@@ -19,7 +22,7 @@ public class Group implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_groups",
             joinColumns = {
-                    @JoinColumn(name = "id", referencedColumnName = "id"
+                    @JoinColumn(name = "group_id", referencedColumnName = "group_id"
                          )},
             inverseJoinColumns = {
                     @JoinColumn(name = "user_id", referencedColumnName = "id"
@@ -28,6 +31,7 @@ public class Group implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonBackReference
     private Course course;
 

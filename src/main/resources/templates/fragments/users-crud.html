@@ -48,7 +48,35 @@
                 <div class="input_container">
                     <label for="email">Email: </label>
                     <div class="field_container">
-                        <input type="text" class="text" name="email" id="email" value="">
+                        <input type="text" class="text" name="profile[email]" id="email" value="">
+                    </div>
+                </div>
+                <div class="input_container">
+                    <label for="name">Name: </label>
+                    <div class="field_container">
+                        <input type="text" class="text" name="profile[name]" id="name" value="">
+                    </div>
+                </div>
+                <div class="input_container">
+                    <label for="age">Age: </label>
+                    <div class="field_container">
+                        <input type="number" class="text" name="profile[age]" id="age" value="">
+                    </div>
+                </div>
+                <div class="input_container">
+                    <label >Roles: </label>
+                    <div class="field_container">
+                        <input type="hidden"   name="roles[0][id]:number" value="0" />
+                        <label for="checkbox_role_user">user: </label>
+                        <input type="checkbox" id="checkbox_role_user" name="roles[0][name]" value="ROLE_USER" checked />
+
+                        <input type="hidden"    name="roles[1][id]:number" value="1" />
+                        <label for="checkbox_role_admin">admin: </label>
+                        <input type="checkbox" id="checkbox_role_admin" name="roles[1][name]" value="ROLE_ADMIN"/>
+
+                        <input type="hidden"   name="roles[2][id]:number" value="2" />
+                        <label for="checkbox_role_teacher">teacher: </label>
+                        <input type="checkbox" id="checkbox_role_teacher" name="roles[2][name]" value="ROLE_TEACHER"/>
                     </div>
                 </div>
                 <div class="button_container">

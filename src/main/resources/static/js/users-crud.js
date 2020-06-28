@@ -151,6 +151,9 @@ userTableConfig = {
     $('#form_user .input_container.password').show();
     $('#form_user #password').val('');
     $('#form_user #email').val('');
+    $('#form_user #name').val('');
+    $('#form_user #age').val('');
+    $('#form_user #email').val('');
     show_lightbox('users');
   });
 
@@ -166,11 +169,13 @@ userTableConfig = {
       form_data.forEach(function(value, key){
           user[key] = value;
       });
+
+      var created_user = $('#form_user').serializeJSON({useIntKeysAsArrayIndex: true});
       // Send user information to database
       var request   = $.ajax({
         url:          '/api/users',
         cache:        false,
-        data:         JSON.stringify(user),
+        data:         JSON.stringify(created_user),
         contentType: "application/json",
         type:         'POST',
         success: function (id) {
@@ -221,10 +226,12 @@ userTableConfig = {
             });
             user.id = id;
 
+      var updated_user = $('#form_user').serializeJSON();
+
       var request   = $.ajax({
         url:          '/api/users/' + id,
         cache:        false,
-        data:         JSON.stringify(user),
+        data:         JSON.stringify(updated_user),
         contentType: "application/json",
         type:         'PUT',
         success: function (user) {

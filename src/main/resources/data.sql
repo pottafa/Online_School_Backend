@@ -9,9 +9,9 @@ insert into lessons(id, course_id,  title) values (111, 104, 'Урок 2 по Sp
 insert into lessons(id, course_id, title)  values (112, 104, 'Урок 3 по Spring');
 insert into lessons(id, course_id, title)  values (113, 104, 'Урок 3 по Spring');
 
-insert into groups (course_id, title, id) values (103, 'First group', 114);
-insert into groups (course_id, title, id) values (103, 'Second group', 118);
-insert into groups (course_id, title, id) values (103, 'Third group', 119);
+insert into groups (course_id, title, group_id) values (103, 'First group', 114);
+insert into groups (course_id, title, group_id) values (103, 'Second group', 118);
+insert into groups (course_id, title, group_id) values (103, 'Third group', 119);
 
 insert into courses(course_id, title, description) values(105, 'Spring Boot', 'Курс по Spring Boot');
 
@@ -27,7 +27,11 @@ insert into users (id, login, password) values (116, 'student', '$2y$12$xAJNHHpZ
 insert into users_roles (user_id, roles_id) values (115, 2 );
 insert into users_roles (user_id, roles_id) values (116, 0 );
 
-insert into profiles (id, age, email, name, user_id) values (118, 27, 'pottafa.spam@gmail.com', 'Alex', 116 );
+insert into profiles (id, age, email, name, user_id) values (118, 40, 'someEmail@gmail.com', 'Joe', 115 );
+insert into profiles (id, age, email, name, user_id) values (119, 27, 'pottafa.spam@gmail.com', 'Alex', 116 );
+
+insert into users_groups (group_id, user_id) values (114, 116 );
+insert into users_groups (group_id, user_id) values (114, 115 );
 
 /*
 Admin creation

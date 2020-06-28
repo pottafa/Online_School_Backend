@@ -400,6 +400,11 @@ table.datatable tbody td.functions .function_buttons a:active,table.datatable tb
     background-color: #666
 }
 
+.text_area_to_hide
+        {
+            visibility: hidden;
+        }
+
 table.datatable tbody td.functions .function_buttons span {
     display: none
 }

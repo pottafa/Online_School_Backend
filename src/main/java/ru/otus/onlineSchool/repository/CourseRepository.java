@@ -18,7 +18,7 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
 
 @Query( value = "SELECT courses.title as title, COUNT(*) as count" +
         " FROM USERS_GROUPS" +
-        " INNER JOIN GROUPS USING (id)" +
+        " INNER JOIN GROUPS USING (group_id)" +
         " INNER JOIN COURSES USING (course_id)" +
         " GROUP BY courses.title", nativeQuery=true)
     List<CourseStatisticsView> getCourseStatistics();
