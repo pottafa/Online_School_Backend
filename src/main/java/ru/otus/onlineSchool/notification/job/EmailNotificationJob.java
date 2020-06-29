@@ -23,6 +23,6 @@ public class EmailNotificationJob extends QuartzJobBean {
         String body = jobDataMap.getString("body");
         String toEmail = jobDataMap.getString("toEmail");
 
-        emailService.sendSimpleMessage(toEmail, subject, body);
+        emailService.sendMessage(toEmail, subject, body);
     }
 }

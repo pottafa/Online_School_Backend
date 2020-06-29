@@ -3,7 +3,11 @@ package ru.otus.onlineSchool.dto;
 public class LessonMenuItemDTO {
    private long id;
    private String title;
-   private String description;
+
+    public LessonMenuItemDTO(long id, String title) {
+        this.id = id;
+        this.title = title;
+    }
 
     public long getId() {
         return id;
@@ -21,11 +25,4 @@ public class LessonMenuItemDTO {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

@@ -12,10 +12,9 @@ var currentRow;
         "columns": [
                             { "data": "id", "sClass": "course_id"  },
                             { "data": "title" , "sClass": "course_title"  },
-                            { "data": "description", "sClass": "course_description"  },
                             { "data": "functions",      "sClass": "functions" ,
                               "defaultContent": "<div class=\"function_buttons\"><ul>" +
-                                                          "<li class=\"function_edit\"><a><span>Edit</span></a></li>" +
+                                                          "<li class=\"function_edit course\"><a><span>Edit</span></a></li>" +
                                                          "<li class=\"function_delete\"><a><span>Delete</span></a></li>" +
                                                           "</ul></div>"},
                               { "data": "page",      "sClass": "functions" ,
@@ -179,18 +178,34 @@ var currentRow;
 //# ===============================
 
   // Edit course button
-  $(document).on('click', '.function_edit a', function(e){
+  $(document).on('click', '.function_edit.course a', function(e){
     e.preventDefault();
     var id      = $(this).closest('tr').find('.course_id').text();
      currentRow = $(this).closest('tr');
+
+     var course;
+     var request   = $.ajax({
+                  url:          '/api/courses/' + id,
+                  cache:        false,
+                  contentType: "application/json",
+                  async: false,
+                  type:         'GET',
+                  success: function (course_response) {
+                   course = course_response;
+                                       },
+                          error: function (e) {
+                          show_message('Update request failed: '+ JSON.parse(e), 'error');
+                   }
+                });
+
         $('#courses_lightbox h2').text('Edit course');
         $('#form_course button').text('Edit course');
         $('#form_course').attr('class', 'form edit');
         $('#form_course').attr('data-id', id);
         $('#form_course .field_container label.error').hide();
         $('#form_course .field_container').removeClass('valid').removeClass('error');
-        $('#form_course #title').val($('.course_title', currentRow).text());
-        $('#form_course #description').val($('.course_description', currentRow).text());
+        $('#form_course #title').val(course.title);
+        $('#form_course #description').val(course.description);
         show_lightbox('courses');
   });
   

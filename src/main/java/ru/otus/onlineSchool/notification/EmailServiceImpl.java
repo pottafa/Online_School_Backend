@@ -16,7 +16,7 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender emailSender;
 
 
-    public boolean sendSimpleMessage(String toEmail, String subject, String body) {
+    public boolean sendMessage(String toEmail, String subject, String body) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(toEmail);

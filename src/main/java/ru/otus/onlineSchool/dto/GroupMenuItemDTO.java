@@ -3,10 +3,6 @@ package ru.otus.onlineSchool.dto;
 public class GroupMenuItemDTO {
    private long id;
    private String title;
-   private int usersCount;
-
-    public GroupMenuItemDTO() {
-    }
 
     public GroupMenuItemDTO(long id, String title) {
         this.id = id;
@@ -27,14 +23,6 @@ public class GroupMenuItemDTO {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public int getUsersCount() {
-        return usersCount;
-    }
-
-    public void setUsersCount(int usersCount) {
-        this.usersCount = usersCount;
     }
 
 }

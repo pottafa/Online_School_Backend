@@ -5,11 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.otus.onlineSchool.dto.UserMenuItemDTO;
 
 import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -46,8 +46,15 @@ public class UserService {
         return id;
     }
 
-    public List<UserMenuItemDTO> findAllUsers() {
-       return userRepository.findAllDTOBy();
+    public List<User> findAllUsers() {
+        List<User> users = new ArrayList<>();
+        userRepository.findAllUserMenuDTOBy().forEach(userDTO -> {
+            User user = new User();
+            user.setId(userDTO.getId());
+            user.setLogin(userDTO.getLogin());
+            users.add(user);
+        });
+        return users;
     }
 
     public String findUserEmail(Long userId) {
@@ -67,9 +74,12 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-       User updatedUser = userRepository.save(user);
-        LOGGER.info("User with id {} was successfully updated", updatedUser.getId());
-        return updatedUser;
+        if(userRepository.existsById(user.getId())) {
+            User updatedUser = userRepository.save(user);
+            LOGGER.info("User with id {} was successfully updated", updatedUser.getId());
+            return updatedUser;
+        }
+        return null;
     }
 
 }

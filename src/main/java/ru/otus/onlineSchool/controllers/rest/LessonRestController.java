@@ -1,27 +1,19 @@
 package ru.otus.onlineSchool.controllers.rest;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
-import ru.otus.onlineSchool.dto.LessonMenuItemDTO;
-import ru.otus.onlineSchool.dto.LessonMenuView;
-import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.entity.Lesson;
 import ru.otus.onlineSchool.service.LessonService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
 public class LessonRestController {
     @Autowired
     private LessonService lessonService;
-    @Autowired
-    private ModelMapper modelMapper;
-
 
     @GetMapping("/api/courses/{courseId}/lessons/{lessonId}")
     public ResponseEntity<?> getLesson(@PathVariable("lessonId") long lessonId) {
@@ -32,9 +24,9 @@ public class LessonRestController {
         return ResponseEntity.ok(new ApiError("Failed get lesson"));
     }
 
-    @GetMapping("/api/courses/{id}/lessons")
-    public ResponseEntity<?> getLessons(@PathVariable("id") long id) {
-        List<LessonMenuView> lessons = lessonService.findLessonByCourse(id, LessonMenuView.class);
+    @GetMapping("/api/courses/{courseId}/lessons")
+    public ResponseEntity<?> getLessons(@PathVariable("courseId") long courseId) {
+        List<Lesson> lessons = lessonService.findLessonByCourse(courseId);
         if (lessons != null) {
             return ResponseEntity.ok(lessons);
         } else {
@@ -63,14 +55,11 @@ public class LessonRestController {
     }
 
     @PutMapping("/api/courses/{courseId}/lessons/{lessonId}")
-    public ResponseEntity<?> updateLesson(@PathVariable("lessonId") Long lessonId,
-                                         @RequestBody LessonMenuItemDTO lesson) {
-        Lesson lessonFromDB = lessonService.findLessonById(lessonId);
-        if (lessonFromDB == null) {
+    public ResponseEntity<?> updateLesson(@PathVariable("lessonId") Long lessonId, @RequestBody Lesson lesson) {
+        Lesson updatedLesson = lessonService.updateLesson(lessonId, lesson);
+        if (updatedLesson == null) {
             return ResponseEntity.ok(new ApiError("Failed update lesson"));
         }
-        modelMapper.map(lesson, lessonFromDB);
-        Lesson updatedLesson = lessonService.updateLesson(lessonFromDB);
-        return ResponseEntity.ok(lessonFromDB);
+        return ResponseEntity.ok(updatedLesson);
     }
 }

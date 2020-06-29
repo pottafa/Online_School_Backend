@@ -13,7 +13,8 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
     Optional<User> findByLogin(String login);
-    List<UserMenuItemDTO> findAllDTOBy();
+
+    List<UserMenuItemDTO> findAllUserMenuDTOBy();
 
     @Query(value = "select email from profiles p where p.user_id = :id", nativeQuery = true)
     String findUserEmail(Long id);

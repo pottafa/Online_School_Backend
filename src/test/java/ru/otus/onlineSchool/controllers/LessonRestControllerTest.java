@@ -3,11 +3,8 @@ package ru.otus.onlineSchool.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import static org.assertj.core.api.Assertions.assertThat;
-
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -21,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
-import ru.otus.onlineSchool.dto.LessonMenuItemDTO;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Lesson;
 import ru.otus.onlineSchool.repository.CourseRepository;
@@ -57,9 +53,6 @@ class LessonRestControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
     @Test
     void createLessonSuccess() throws Exception {
         Long courseId = 103L;
@@ -88,7 +81,7 @@ class LessonRestControllerTest {
 
     @Test
     void createLessonErrorMessage() throws Exception {
-        Long notExistCourseId = 55L;
+        long notExistCourseId = 55;
 
         ApiError apiError = new ApiError("Failed create lesson");
         String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
@@ -169,8 +162,7 @@ class LessonRestControllerTest {
         // Обновляем, сохраняем
         lesson.setTitle("Введение Updated Title");
 
-        LessonMenuItemDTO lessonDto = modelMapper.map(lesson, LessonMenuItemDTO.class);
-        String lessonJson = new ObjectMapper().writeValueAsString(lessonDto);
+        String lessonJson = new ObjectMapper().writeValueAsString(lesson);
         mvc.perform(put("/api/courses/" + courseId + "/lessons/" + lessonId)
                 .contentType("application/json")
                 .content(lessonJson))
@@ -202,10 +194,9 @@ class LessonRestControllerTest {
         // Обновляем, сохраняем
         lesson.setTitle("Введение Updated Title");
 
-        LessonMenuItemDTO lessonDto = modelMapper.map(lesson, LessonMenuItemDTO.class);
         String lessonJson = new ObjectMapper().writeValueAsString(lesson);
 
-        mvc.perform(put("/api/courses/" + courseId + "/lessons/" + lessonId)
+        mvc.perform(put("/api/courses/" + courseId + "/lessons/" + lessonId )
                 .contentType("application/json")
                 .content(lessonJson))
                 .andDo(print())

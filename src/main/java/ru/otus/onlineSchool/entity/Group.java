@@ -20,6 +20,7 @@ public class Group implements Serializable {
     @Column(name = "title", unique = true)
     private String title;
     @ManyToMany(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinTable(name = "users_groups",
             joinColumns = {
                     @JoinColumn(name = "group_id", referencedColumnName = "group_id"

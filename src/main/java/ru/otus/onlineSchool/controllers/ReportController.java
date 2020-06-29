@@ -18,7 +18,7 @@ public class ReportController {
 
     @GetMapping("/admin-panel/statistics/courses")
     protected String courseUsersCount(Model model) {
-        List<CourseStatisticsView> courses = courseService.findAllCourses();
+        List<CourseStatisticsView> courses = courseService.getAllCoursesStatisticsByUsers();
         model.addAttribute("coursesDTO", courses);
         return USERS_COUNT_PAGE;
     }

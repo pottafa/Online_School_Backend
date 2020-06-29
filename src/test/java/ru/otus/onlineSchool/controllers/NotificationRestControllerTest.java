@@ -78,8 +78,8 @@ public class NotificationRestControllerTest {
 
         for (String groupName : scheduler.getJobGroupNames()) {
             for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
-                 jobDetail = scheduler.getJobDetail(jobKey);
-                 triggersOfJob = scheduler.getTriggersOfJob(jobKey);
+                jobDetail = scheduler.getJobDetail(jobKey);
+                triggersOfJob = scheduler.getTriggersOfJob(jobKey);
             }
         }
         assertThat(jobDetail).isNotNull();
@@ -198,8 +198,8 @@ public class NotificationRestControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-       List<JobDetail> jobDetails = new ArrayList<>();
-       List<List<? extends Trigger>> triggersOfJobs = new ArrayList<>();
+        List<JobDetail> jobDetails = new ArrayList<>();
+        List<List<? extends Trigger>> triggersOfJobs = new ArrayList<>();
         for (String groupName : scheduler.getJobGroupNames()) {
             for (JobKey jobKey : scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName))) {
                 jobDetails.add(scheduler.getJobDetail(jobKey));

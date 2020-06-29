@@ -12,8 +12,6 @@ var currentRow;
         "columns": [
                             { "data": "id", "sClass": "group_id"  },
                             { "data": "title" , "sClass": "group_title"  },
-                            { "data": "usersCount", "sClass": "group_users_count",
-                              "defaultContent": ""},
                             { "data": "functions",      "sClass": "functions" ,
                               "defaultContent": "<div class=\"function_buttons\"><ul>" +
                                                           "<li class=\"function_edit\"><a><span>Edit</span></a></li>" +
@@ -147,7 +145,6 @@ var currentRow;
     $('#form_group .field_container label.error').hide();
     $('#form_group .field_container').removeClass('valid').removeClass('error');
     $('#form_group #group_title').val('');
-    $('#form_group #users_count').val('');
     show_lightbox('group');
   });
 
@@ -191,14 +188,29 @@ var currentRow;
     e.preventDefault();
     var id      = $(this).closest('tr').find('.group_id').text();
      currentRow = $(this).closest('tr');
+
+      var group;
+               var request   = $.ajax({
+                            url:          '/api/courses/' + course_id + '/groups/' + id,
+                            cache:        false,
+                            contentType: "application/json",
+                            async: false,
+                            type:         'GET',
+                            success: function (group_response) {
+                             group = group_response;
+                                                 },
+                                    error: function (e) {
+                                    show_message('Update request failed: '+ JSON.parse(e), 'error');
+                             }
+                          });
+
         $('.lightbox_content h2').text('Edit group');
         $('#form_group button').text('Edit group');
         $('#form_group').attr('class', 'form edit');
         $('#form_group').attr('data-id', id);
         $('#form_group .field_container label.error').hide();
         $('#form_group .field_container').removeClass('valid').removeClass('error');
-        $('#form_group #group_title').val($('.group_title', currentRow).text());
-        $('#form_group #users_count').val($('.group_users_count', currentRow).text());
+        $('#form_group #group_title').val(group.title);
         show_lightbox('group');
   });
   
