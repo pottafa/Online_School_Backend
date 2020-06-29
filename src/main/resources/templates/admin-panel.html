@@ -29,7 +29,6 @@
         <li><a data-toggle="pill" href="#start_tab">Start page</a></li>
         <li><a id="load_users" data-toggle="pill" href="#users_tab">Users</a></li>
         <li><a id="load_courses" data-toggle="pill" href="#courses_tab">Courses</a></li>
-        <li><a id="load_courses" data-toggle="pill" href="#courses_tab">Notifications</a></li>
       </ul>
     </nav>
 
@@ -53,7 +52,6 @@
         </div>
         <div id="users_tab" class="tab-pane fade" th:insert="fragments/users-crud :: users"></div>
         <div id="courses_tab" class="tab-pane fade" th:insert="fragments/courses-crud :: courses"></div>
-        <div id="notofocations_tab" class="tab-pane fade" ></div>
 
       </div>
 
@@ -91,5 +89,6 @@ $('#sidebarCollapse').on('click', function () {
   <script type="text/javascript" src="js/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/popper.min.js"></script>
   <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/js/serializejson.min.js"></script>
   </body>
 </html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users count report</title>
+</head>
+<body>
+
+<div id="users_count">
+    <h3>Courses statistics</h3>
+    <table style="width: 40%">
+        <thead>
+        <tr>
+            <th style="width: 5%">Course name</th>
+            <th style="width: 5%">Total number of students</th>
+        </tr>
+        </thead>
+        <tbody style="background-color: #FFA500">
+        <tr th:each="course : ${coursesDTO}">
+            <td th:text="${course.title}"></td>
+            <td th:text="${course.count}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

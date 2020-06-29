@@ -1,43 +1,34 @@
 package ru.otus.onlineSchool.controllers.rest;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
-import ru.otus.onlineSchool.dto.GroupMenuItemDTO;
 import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.service.GroupService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class GroupRestController {
 
     @Autowired
     private GroupService groupService;
-    @Autowired
-    private ModelMapper modelMapper;
-
 
     @GetMapping("/api/courses/{courseId}/groups/{groupId}")
     public ResponseEntity<?> getGroup(@PathVariable("groupId") long groupId) {
         Group group = groupService.findGroupById(groupId);
         if (group != null) {
-                return ResponseEntity.ok(group);
+            return ResponseEntity.ok(group);
         }
         return ResponseEntity.ok(new ApiError("Failed get group"));
     }
 
-    @GetMapping("/api/courses/{id}/groups")
-    public ResponseEntity<?> getGroups(@PathVariable("id") long id) {
-        List<Group> groups = groupService.findGroupByCourse(id);
+    @GetMapping("/api/courses/{courseId}/groups")
+    public ResponseEntity<?> getGroups(@PathVariable("courseId") long courseId) {
+        List<Group> groups = groupService.findGroupByCourse(courseId);
         if (groups != null) {
-            List<GroupMenuItemDTO> groupsDto = groups.stream()
-                    .map(group -> modelMapper.map(group, GroupMenuItemDTO.class))
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(groupsDto);
+            return ResponseEntity.ok(groups);
         } else {
             return ResponseEntity.ok(new ApiError("Failed get groups"));
         }
@@ -66,21 +57,19 @@ public class GroupRestController {
 
     @PutMapping("/api/courses/{courseId}/groups/{groupId}")
     public ResponseEntity<?> updateGroup(@PathVariable("groupId") Long groupId,
-                                         @RequestBody GroupMenuItemDTO group) {
-        Group groupFromDB = groupService.findGroupById(groupId);
-        if (groupFromDB == null) {
+                                         @RequestBody Group group) {
+        Group updatedGroup = groupService.updateGroup(groupId, group);
+        if (updatedGroup == null) {
             return ResponseEntity.ok(new ApiError("Failed update group"));
         }
-        modelMapper.map(group, groupFromDB);
-        Group updatedGroup = groupService.updateGroup(groupFromDB);
-        return ResponseEntity.ok(groupFromDB);
+        return ResponseEntity.ok(updatedGroup);
     }
 
     @PutMapping("/api/courses/{courseId}/groups/{groupId}/users")
     public ResponseEntity<?> addUsersToTheGroup(@PathVariable("groupId") Long groupId, @RequestBody List<Long> usersId) {
         Group updatedGroup = groupService.addUsers(groupId, usersId);
         if (updatedGroup != null) {
-            return ResponseEntity.ok(modelMapper.map(updatedGroup, GroupMenuItemDTO.class));
+            return ResponseEntity.ok(updatedGroup);
         } else {
             return ResponseEntity.ok(new ApiError("Failed add users to the group"));
         }

@@ -3,7 +3,6 @@ package ru.otus.onlineSchool.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
-import ru.otus.onlineSchool.dto.GroupMenuItemDTO;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.entity.User;
@@ -61,12 +59,9 @@ class GroupRestControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
     @Test
     void createGroupSuccess() throws Exception {
-        Long courseId = 103L;
+        long courseId = 103;
         Course courseFromDb = courseRepository.findById(courseId).orElse(null);
 
         Group group = new Group();
@@ -92,7 +87,7 @@ class GroupRestControllerTest {
 
     @Test
     void createGroupErrorMessage() throws Exception {
-        Long notExistCourseId = 55L;
+        int notExistCourseId = 55;
 
         ApiError apiError = new ApiError("Failed create group");
         String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
@@ -172,9 +167,9 @@ class GroupRestControllerTest {
 
         // Обновляем, сохраняем
         group.setTitle("First group Updated Title");
+        group.setUsers(null);
 
-        GroupMenuItemDTO groupDto = modelMapper.map(group, GroupMenuItemDTO.class);
-        String groupJson = new ObjectMapper().writeValueAsString(groupDto);
+        String groupJson = new ObjectMapper().writeValueAsString(group);
         mvc.perform(put("/api/courses/" + courseId + "/groups/" + groupId)
                 .contentType("application/json")
                 .content(groupJson))
@@ -205,9 +200,9 @@ class GroupRestControllerTest {
 
         // Обновляем, сохраняем
         group.setTitle("First group Updated Title");
+        group.setUsers(null);
 
-        GroupMenuItemDTO groupDto = modelMapper.map(group, GroupMenuItemDTO.class);
-        String groupJson = new ObjectMapper().writeValueAsString(groupDto);
+        String groupJson = new ObjectMapper().writeValueAsString(group);
 
         mvc.perform(put("/api/courses/" + courseId + "/groups/" + groupId)
                 .contentType("application/json")
@@ -245,9 +240,9 @@ class GroupRestControllerTest {
     @Test
     void addUsersToTheGroupSuccess() throws Exception {
 
-        Long courseId = 103L;
-        Long groupId = 114L;
-        List<Long> usersIds = Arrays.asList(115L, 116L);
+        int courseId = 103;
+        long groupId = 114;
+        List<Integer> usersIds = Arrays.asList(115, 116);
 
         String usersIdsJson = new ObjectMapper().writeValueAsString(usersIds);
 
@@ -274,9 +269,9 @@ class GroupRestControllerTest {
         ApiError apiError = new ApiError("Failed add users to the group");
         String expectedResult = new ObjectMapper().writeValueAsString(apiError);
 
-        Long courseId = 103L;
-        Long groupId = 1111L;
-        List<Long> usersIds = Arrays.asList(115L, 116L);
+        int courseId = 103;
+        int groupId = 1111;
+        List<Integer> usersIds = Arrays.asList(115, 116);
 
         String usersIdsJson = new ObjectMapper().writeValueAsString(usersIds);
 
@@ -291,10 +286,10 @@ class GroupRestControllerTest {
 
     @Test
     void getUsersToTheGroupSuccess() throws Exception {
-        Long courseId = 103L;
-        Long groupId = 114L;
+        int courseId = 103;
+        int groupId = 114;
 
-        List<Long> usersIds = Arrays.asList(115L, 116L);
+        List<Integer> usersIds = Arrays.asList(115, 116);
 
         String usersIdsJson = new ObjectMapper().writeValueAsString(usersIds);
 
@@ -318,8 +313,8 @@ class GroupRestControllerTest {
         ApiError apiError = new ApiError("Failed get users from the group");
         String expectedResult = new ObjectMapper().writeValueAsString(apiError);
 
-        Long courseId = 103L;
-        Long groupId = 111111L;
+        int courseId = 103;
+        int groupId = 111111;
 
         mvc.perform(get("/api/courses/" + courseId + "/groups/" + groupId + "/users"))
                 .andDo(print())

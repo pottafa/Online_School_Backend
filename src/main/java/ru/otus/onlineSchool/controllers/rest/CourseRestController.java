@@ -1,25 +1,18 @@
 package ru.otus.onlineSchool.controllers.rest;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
-import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
-import ru.otus.onlineSchool.dto.UserMenuItemDTO;
 import ru.otus.onlineSchool.entity.Course;
-import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.service.CourseService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class CourseRestController {
     @Autowired
     private CourseService courseService;
-    @Autowired
-    private ModelMapper modelMapper;
 
     @GetMapping("/api/courses/{id}")
     public ResponseEntity<?> getCourse(@PathVariable("id") long id) {
@@ -42,10 +35,8 @@ public class CourseRestController {
     }
 
     @GetMapping("/api/courses")
-    public ResponseEntity<List<CourseMenuItemDTO>> getAllCourses() {
-        List<CourseMenuItemDTO> courses = courseService.findAllCourses().stream()
-                .map(course -> modelMapper.map(course, CourseMenuItemDTO.class))
-                .collect(Collectors.toList());
+    public ResponseEntity<List<Course>> getAllCourses() {
+        List<Course> courses = courseService.findAllCourses();
         return ResponseEntity.ok(courses);
     }
 
@@ -60,13 +51,11 @@ public class CourseRestController {
     }
 
     @PutMapping("/api/courses/{courseId}")
-    public ResponseEntity<?> updateCourse(@PathVariable("courseId") Long courseId, @RequestBody CourseMenuItemDTO course) {
-        Course courseFromDb = courseService.findCourseById(courseId);
-        if (courseFromDb == null) {
+    public ResponseEntity<?> updateCourse(@PathVariable("courseId") Long courseId, @RequestBody Course course) {
+        Course updatedCourse = courseService.updateCourse(courseId, course);
+        if (updatedCourse == null) {
             return ResponseEntity.ok(new ApiError("Failed update course"));
         }
-        modelMapper.map(course, courseFromDb);
-        Course updatedCourse = courseService.updateCourse(courseFromDb);
         return ResponseEntity.ok(updatedCourse);
     }
 

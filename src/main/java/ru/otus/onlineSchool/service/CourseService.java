@@ -4,8 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.otus.onlineSchool.dto.CourseStatisticsView;
+import ru.otus.onlineSchool.dto.CourseView;
 import ru.otus.onlineSchool.entity.Course;
-import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.CourseRepository;
 
 import javax.transaction.Transactional;
@@ -38,7 +39,12 @@ public class CourseService {
 
     public List<Course> findAllCourses() {
         List<Course> courses = new ArrayList<>();
-        courseRepository.findAll().forEach(courses::add);
+        courseRepository.findAllCoursesMenuDTOBy().forEach(courseDTO -> {
+            Course course = new Course();
+            course.setId(courseDTO.getId());
+            course.setTitle(courseDTO.getTitle());
+            courses.add(course);
+        });
         return courses;
     }
 
@@ -47,8 +53,8 @@ public class CourseService {
         return course.orElse(null);
     }
 
-    public Course findCourseByTitle(String title) {
-        Optional<Course> course = courseRepository.findByTitle(title);
+    public CourseView findCoursePageViewById(long courseId) {
+        Optional<CourseView> course = courseRepository.findCoursePageViewById(courseId);
         return course.orElse(null);
     }
 
@@ -77,11 +83,8 @@ public class CourseService {
         return updatedCourse;
     }
 
-    @Transactional
-    public Course updateCourse(Course course) {
-        Course updatedCourse = courseRepository.save(course);
-        LOGGER.info("Course with id {} was successfully updated", updatedCourse.getId());
-        return updatedCourse;
+    public List<CourseStatisticsView> getAllCoursesStatisticsByUsers() {
+        return courseRepository.findAllCoursesStatisticsByUsers();
     }
 
 }

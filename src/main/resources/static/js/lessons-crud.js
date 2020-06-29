@@ -12,7 +12,6 @@ var currentRow;
         "columns": [
                             { "data": "id", "sClass": "lesson_id"  },
                             { "data": "title" , "sClass": "lesson_title"  },
-                            { "data": "description", "sClass": "lesson_description"  },
                             { "data": "functions",      "sClass": "functions" ,
                               "defaultContent": "<div class=\"function_buttons\"><ul>" +
                                                           "<li class=\"function_edit\"><a><span>Edit</span></a></li>" +
@@ -178,14 +177,30 @@ var currentRow;
     e.preventDefault();
     var id      = $(this).closest('tr').find('.lesson_id').text();
      currentRow = $(this).closest('tr');
+
+     var lesson;
+          var request   = $.ajax({
+                       url:          '/api/courses/' + course_id + '/lessons/' + id,
+                       cache:        false,
+                       contentType: "application/json",
+                       async: false,
+                       type:         'GET',
+                       success: function (lesson_response) {
+                        lesson = lesson_response;
+                                            },
+                               error: function (e) {
+                               show_message('Update request failed: '+ JSON.parse(e), 'error');
+                        }
+                     });
+
         $('.lightbox_content h2').text('Edit lesson');
         $('#form_lesson button').text('Edit lesson');
         $('#form_lesson').attr('class', 'form edit');
         $('#form_lesson').attr('data-id', id);
         $('#form_lesson .field_container label.error').hide();
         $('#form_lesson .field_container').removeClass('valid').removeClass('error');
-        $('#form_lesson #title').val($('.lesson_title', currentRow).text());
-        $('#form_lesson #description').val($('.lesson_description', currentRow).text());
+        $('#form_lesson #title').val(lesson.title);
+        $('#form_lesson #description').val(lesson.description);
         show_lightbox();
   });
   

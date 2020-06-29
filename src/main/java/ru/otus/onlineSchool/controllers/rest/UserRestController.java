@@ -1,27 +1,18 @@
 package ru.otus.onlineSchool.controllers.rest;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
-import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
-import ru.otus.onlineSchool.dto.UserMenuItemDTO;
-import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.entity.User;
-import ru.otus.onlineSchool.notification.EmailService;
 import ru.otus.onlineSchool.service.UserService;
-
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 public class UserRestController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private ModelMapper modelMapper;
-
 
     @GetMapping("/api/users/{id}")
     public ResponseEntity<?> getUser(@PathVariable("id") long id) {
@@ -34,8 +25,7 @@ public class UserRestController {
     }
 
     @PostMapping("/api/users")
-    public ResponseEntity<?> createUser(@RequestBody UserMenuItemDTO userMenuItemDTO) {
-        User user = modelMapper.map(userMenuItemDTO, User.class);
+    public ResponseEntity<?> createUser(@RequestBody User user) {
         Long id = userService.createUser(user);
         if (id != null) return ResponseEntity.ok(id);
         else return ResponseEntity.ok(new ApiError("Failed create user"));
@@ -43,9 +33,7 @@ public class UserRestController {
 
     @GetMapping("/api/users")
     public ResponseEntity<?> getUsers() {
-        List<UserMenuItemDTO> users = userService.findAllUsers().stream()
-                .map(user -> modelMapper.map(user, UserMenuItemDTO.class))
-                .collect(Collectors.toList());
+        List<User> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
     }
 
@@ -60,13 +48,11 @@ public class UserRestController {
     }
 
     @PutMapping("/api/users/{userId}")
-    public ResponseEntity<?> updateUser(@PathVariable("userId") Long userId, @RequestBody UserMenuItemDTO user) {
-        User userFromDb = userService.findUserById(userId);
-        if (userFromDb == null) {
+    public ResponseEntity<?> updateUser(@PathVariable("userId") Long userId, @RequestBody User user) {
+        User updatedUser = userService.updateUser(user);
+        if (updatedUser == null) {
             return ResponseEntity.ok(new ApiError("Failed update user"));
         }
-        modelMapper.map(user, userFromDb);
-        User updatedUser = userService.updateUser(userFromDb);
         return ResponseEntity.ok(updatedUser);
     }
 

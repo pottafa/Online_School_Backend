@@ -3,7 +3,6 @@ package ru.otus.onlineSchool.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,13 +11,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
-import ru.otus.onlineSchool.dto.UserMenuItemDTO;
 import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.UserRepository;
 
@@ -49,9 +48,6 @@ class UserRestControllerTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     @Test
     void createUserSuccess() throws Exception {
@@ -84,8 +80,7 @@ class UserRestControllerTest {
         user.setLogin("user with existed id");
         user.setId(116);
 
-        UserMenuItemDTO userDto = modelMapper.map(user, UserMenuItemDTO.class);
-        String userJson = new ObjectMapper().writeValueAsString(userDto);
+        String userJson = new ObjectMapper().writeValueAsString(user);
 
         mvc.perform(post("/api/users")
                 .contentType("application/json")
@@ -150,9 +145,9 @@ class UserRestControllerTest {
         assertThat(user.getLogin()).isEqualTo("student");
         // Обновляем, сохраняем
         user.setLogin("student Updated Login");
+        user.setRoles(null);
 
-        UserMenuItemDTO userDto = modelMapper.map(user, UserMenuItemDTO.class);
-        String userJson = new ObjectMapper().writeValueAsString(userDto);
+        String userJson = new ObjectMapper().writeValueAsString(user);
         mvc.perform(put("/api/users/" + userId)
                 .contentType("application/json")
                 .content(userJson))
@@ -169,21 +164,21 @@ class UserRestControllerTest {
     void updateUserErrorMessage() throws Exception {
         ApiError apiError = new ApiError("Failed update user");
         String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
-        long userId = 116;
+        long userId = 117;
 
         // Проверим, что было в начале
         User user = userRepository.findById(userId).orElse(null);
         assertThat(user).isNotNull();
-        assertThat(user.getLogin()).isEqualTo("student");
+        assertThat(user.getLogin()).isEqualTo("admin");
 
         // Удалим пользователь
         userRepository.deleteById(userId);
 
         // Обновляем, сохраняем
         user.setLogin("Updated Login");
+        user.setRoles(null);
 
-        UserMenuItemDTO userDto = modelMapper.map(user, UserMenuItemDTO.class);
-        String userJson = new ObjectMapper().writeValueAsString(userDto);
+        String userJson = new ObjectMapper().writeValueAsString(user);
 
         mvc.perform(put("/api/users/" + userId)
                 .contentType("application/json")

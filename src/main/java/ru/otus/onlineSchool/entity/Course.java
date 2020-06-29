@@ -1,11 +1,8 @@
 package ru.otus.onlineSchool.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "courses")
@@ -13,6 +10,7 @@ import java.util.List;
 public class Course {
 
     @Id
+    @Column(name = "course_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
     @Column(name = "title")

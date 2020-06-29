@@ -1,6 +1,8 @@
 package ru.otus.onlineSchool.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -12,22 +14,25 @@ import java.util.List;
 @Table(name = "groups")
 public class Group implements Serializable {
     @Id
+    @Column(name = "group_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     @Column(name = "title", unique = true)
     private String title;
     @ManyToMany(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinTable(name = "users_groups",
             joinColumns = {
-                    @JoinColumn(name = "user_id", referencedColumnName = "id"
+                    @JoinColumn(name = "group_id", referencedColumnName = "group_id"
                          )},
             inverseJoinColumns = {
-                    @JoinColumn(name = "group_id", referencedColumnName = "id"
+                    @JoinColumn(name = "user_id", referencedColumnName = "id"
                            )})
     private List<User> users;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonBackReference
     private Course course;
 
@@ -75,15 +80,4 @@ public class Group implements Serializable {
         this.title = title;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Group)) return false;
-        return id != null && id.equals(((Group) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return 11;
-    }
 }

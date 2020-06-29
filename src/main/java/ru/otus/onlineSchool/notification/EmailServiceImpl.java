@@ -7,15 +7,8 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import ru.otus.onlineSchool.notification.message.EmailNotificationTemplate;
-import ru.otus.onlineSchool.service.CourseService;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.util.Date;
-
-
-@Service("EmailService")
+@Service
 public class EmailServiceImpl implements EmailService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmailServiceImpl.class);
 
@@ -23,20 +16,16 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender emailSender;
 
 
-    public boolean sendSimpleMessage(String to, EmailNotificationTemplate emailNotificationTemplate) {
+    public boolean sendMessage(String toEmail, String subject, String body) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(to);
-            message.setSubject(emailNotificationTemplate.getSubject());
-            message.setText(emailNotificationTemplate.getMessage());
+            message.setTo(toEmail);
+            message.setSubject(subject);
+            message.setText(body);
 
-            Date dateToSent = emailNotificationTemplate.getDate();
-            if(dateToSent != null) {
-                message.setSentDate(dateToSent);
-            }
             emailSender.send(message);
         } catch (MailException exception) {
-            LOGGER.error("Failed send message to {}", to, exception);
+            LOGGER.error("Failed send message to {}", toEmail, exception);
             return false;
         }
         return true;

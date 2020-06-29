@@ -1,6 +1,8 @@
 package ru.otus.onlineSchool.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
@@ -18,6 +20,8 @@ public class Lesson {
     @Column(name = "description")
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonBackReference
     private Course course;
 
@@ -62,15 +66,4 @@ public class Lesson {
         this.course = course;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Lesson)) return false;
-        return id != null && id.equals(((Lesson) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return 11;
-    }
 }

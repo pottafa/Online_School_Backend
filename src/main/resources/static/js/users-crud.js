@@ -11,13 +11,9 @@ userTableConfig = {
       "columns": [
                           { "data": "id", "sClass": "user_id"  },
                           { "data": "login" , "sClass": "user_login"  },
-                          { "data": "email", "sClass": "user_email" ,
-                                                                                "defaultContent": ""},
-                           { "data": "roles", "sClass": "roles" ,
-                                                      "defaultContent": ""},
                           { "data": "functions",      "sClass": "functions" ,
                             "defaultContent": "<div class=\"function_buttons\"><ul>" +
-                                                        "<li class=\"function_edit\"><a><span>Edit</span></a></li>" +
+                                                        "<li class=\"function_edit user\"><a><span>Edit</span></a></li>" +
                                                        "<li class=\"function_delete\"><a><span>Delete</span></a></li>" +
                                                        "<li class=\"function_send_notification\"><a><span>Send notification</span></a></li>" +
                                                         "</ul></div>"}
@@ -115,7 +111,7 @@ userTableConfig = {
     function show_lightbox(param){
       $('.lightbox_bg').show();
       if (param === 'users') {
-      $('.lightbox_container.users').show();
+      $('#users_lightbox').show();
       };
       if (param === 'notification') {
           $('.lightbox_container.notification').show();
@@ -145,6 +141,9 @@ userTableConfig = {
   $(document).on('click', '#add_user', function(e){
     e.preventDefault();
     currentRow = $(this).closest('tr');
+     $( "#form_user #checkbox_role_user" ).prop( "checked", false );
+            $( "#form_user #checkbox_role_admin" ).prop( "checked", false );
+            $( "#form_user #checkbox_role_teacher" ).prop( "checked", false );
     $('.lightbox_content h2').text('Add user');
     $('#form_user button').text('Add user');
     $('#form_user').attr('class', 'form add');
@@ -154,6 +153,9 @@ userTableConfig = {
     $('#form_user #login').val('');
     $('#form_user .input_container.password').show();
     $('#form_user #password').val('');
+    $('#form_user #email').val('');
+    $('#form_user #name').val('');
+    $('#form_user #age').val('');
     $('#form_user #email').val('');
     show_lightbox('users');
   });
@@ -165,22 +167,19 @@ userTableConfig = {
     if (form_user.valid() == true){
       // Get data from user form
       hide_lightbox();
-      var user = {};
-      const form_data = new FormData(document.querySelector('#form_user'));
-      form_data.forEach(function(value, key){
-          user[key] = value;
-      });
+
+      var created_user = $('#form_user').serializeJSON({useIntKeysAsArrayIndex: true});
       // Send user information to database
       var request   = $.ajax({
         url:          '/api/users',
         cache:        false,
-        data:         JSON.stringify(user),
+        data:         JSON.stringify(created_user),
         contentType: "application/json",
         type:         'POST',
         success: function (id) {
-                 show_message("User '" + user.login + "' added successfully.", 'success');
-                 user.id = id;
-                           table_users.row.add(user).draw();
+                 show_message("User '" + created_user.login + "' added successfully.", 'success');
+                 created_user.id = id;
+                           table_users.row.add(created_user).draw();
                      },
         error: function (e) {
         show_message('Add request failed: '+ JSON.parse(e), 'error');
@@ -194,22 +193,60 @@ userTableConfig = {
 //# ===============================
 
   // Edit user button
-  $(document).on('click', '.function_edit a', function(e){
+  $(document).on('click', '.function_edit.user a', function(e){
     e.preventDefault();
     var id      = $(this).closest('tr').find('.user_id').text();
-     currentRow = $(this).closest('tr');
-        $('.lightbox_content h2').text('Edit user');
+    currentRow = $(this).closest('tr');
+    var user;
+
+     var request   = $.ajax({
+             url:          '/api/users/' + id,
+             cache:        false,
+             contentType: "application/json",
+             async: false,
+             type:         'GET',
+             success: function (user_response) {
+              user = user_response;
+                                  },
+                     error: function (e) {
+                     show_message('Update request failed: '+ JSON.parse(e), 'error');
+              }
+           });
+        var user_roles = user.roles;
+        $( "#form_user #checkbox_role_user" ).prop( "checked", false );
+        $( "#form_user #checkbox_role_admin" ).prop( "checked", false );
+        $( "#form_user #checkbox_role_teacher" ).prop( "checked", false );
+        $('#users_lightbox h2').text('Edit user');
         $('#form_user button').text('Edit user');
         $('#form_user').attr('class', 'form edit');
         $('#form_user').attr('data-id', id);
         $('#form_user .field_container label.error').hide();
         $('#form_user .field_container').removeClass('valid').removeClass('error');
-        $('#form_user #login').val($('.user_login', currentRow).text());
-        $('#form_user .input_container.password').hide();
-        $('#form_user #email').val($('.user_email', currentRow).text());
+        $('#form_user #login').val(user.login);
+        $('#form_user #password').val(user.password);
+        if(user.profile != null) {
+        $('#form_user #email').val((user.profile).email);
+        $('#form_user #name').val((user.profile).name);
+        $('#form_user #age').val((user.profile).age);
+        } else {
+        $('#form_user #email').val('');
+                $('#form_user #name').val('');
+                $('#form_user #age').val('');
+        };
+
+        if(user_roles.includes(user_roles.find(el=>el.id===0))) {
+                $( "#form_user #checkbox_role_user" ).prop( "checked", true );
+        };
+        if(user_roles.includes(user_roles.find(el=>el.id===1))) {
+                $( "#form_user #checkbox_role_admin" ).prop( "checked", true );
+                };
+        if(user_roles.includes(user_roles.find(el=>el.id===2))) {
+                $( "#form_user #checkbox_role_teacher" ).prop( "checked", true );
+                };
         show_lightbox('users');
   });
-  
+
+
   // Edit user submit form
   $(document).on('submit', '#form_user.edit', function(e){
     e.preventDefault();
@@ -218,17 +255,13 @@ userTableConfig = {
       // Send user information to server
       hide_lightbox();
       var id        = $('#form_user').attr('data-id');
-      var user = {};
-            const form_data = new FormData(document.querySelector('#form_user'));
-            form_data.forEach(function(value, key){
-                user[key] = value;
-            });
-            user.id = id;
+      var updated_user = $('#form_user').serializeJSON({useIntKeysAsArrayIndex: true});
+            updated_user.id = id;
 
       var request   = $.ajax({
         url:          '/api/users/' + id,
         cache:        false,
-        data:         JSON.stringify(user),
+        data:         JSON.stringify(updated_user),
         contentType: "application/json",
         type:         'PUT',
         success: function (user) {
@@ -291,7 +324,6 @@ userTableConfig = {
     // Create user notification submit form
     $(document).on('submit', '#form_notification', function(e){
       e.preventDefault();
-      // Validate form
         // Send user information to server
         hide_lightbox();
         var id  = $('#form_notification').attr('data-id');

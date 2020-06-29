@@ -3,7 +3,6 @@ package ru.otus.onlineSchool.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,8 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
-import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
-import ru.otus.onlineSchool.dto.UserMenuItemDTO;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.repository.CourseRepository;
 
@@ -51,18 +48,15 @@ class CourseRestControllerTest {
     @Autowired
     private CourseRepository courseRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
 
     @Test
     void createCourseSuccess() throws Exception {
         Course course = new Course();
         course.setTitle("Test course");
 
-        CourseMenuItemDTO courseDto = modelMapper.map(course, CourseMenuItemDTO.class);
-        String courseJson = new ObjectMapper().writeValueAsString(courseDto);
+        String courseJson = new ObjectMapper().writeValueAsString(course);
 
-      MvcResult result = mvc.perform(post("/api/courses")
+        MvcResult result = mvc.perform(post("/api/courses")
                 .contentType("application/json")
                 .content(courseJson))
                 .andDo(print())
@@ -85,8 +79,7 @@ class CourseRestControllerTest {
         course.setTitle("course with existed id");
         course.setId(103);
 
-        CourseMenuItemDTO courseDto = modelMapper.map(course, CourseMenuItemDTO.class);
-        String courseJson = new ObjectMapper().writeValueAsString(courseDto);
+        String courseJson = new ObjectMapper().writeValueAsString(course);
 
         mvc.perform(post("/api/courses")
                 .contentType("application/json")
@@ -104,10 +97,10 @@ class CourseRestControllerTest {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$.[?(@.id == 103 && @.title == 'Java SE' && @.description == 'Курс по Java SE')]").exists())
-                .andExpect(jsonPath("$.[?(@.id == 104 && @.title == 'Spring' && @.description == 'Курс по Spring Framework')]").exists())
-                .andExpect(jsonPath("$.[?(@.id == 105 && @.title == 'Spring Boot' && @.description == 'Курс по Spring Boot')]").exists())
-                .andExpect(jsonPath("$.[?(@.id == 106 && @.title == 'Java Script' && @.description == 'Курс по JS' )]").exists());
+                .andExpect(jsonPath("$.[?(@.id == 103 && @.title == 'Java SE')]").exists())
+                .andExpect(jsonPath("$.[?(@.id == 104 && @.title == 'Spring')]").exists())
+                .andExpect(jsonPath("$.[?(@.id == 105 && @.title == 'Spring Boot')]").exists())
+                .andExpect(jsonPath("$.[?(@.id == 106 && @.title == 'Java Script')]").exists());
     }
 
     @Test
@@ -156,8 +149,7 @@ class CourseRestControllerTest {
         course.setTitle("Java SE Updated Title");
         course.setDescription("Курс по Java SE Updated Description");
 
-        CourseMenuItemDTO courseDto = modelMapper.map(course, CourseMenuItemDTO.class);
-        String courseJson = new ObjectMapper().writeValueAsString(courseDto);
+        String courseJson = new ObjectMapper().writeValueAsString(course);
         mvc.perform(put("/api/courses/" + courseId)
                 .contentType("application/json")
                 .content(courseJson))
@@ -190,8 +182,7 @@ class CourseRestControllerTest {
         course.setTitle("Updated Title");
         course.setDescription("Updated Description");
 
-        CourseMenuItemDTO courseDto = modelMapper.map(course, CourseMenuItemDTO.class);
-        String courseJson = new ObjectMapper().writeValueAsString(courseDto);
+        String courseJson = new ObjectMapper().writeValueAsString(course);
 
         mvc.perform(put("/api/courses/" + courseId)
                 .contentType("application/json")
