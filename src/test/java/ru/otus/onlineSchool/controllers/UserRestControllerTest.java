@@ -2,7 +2,6 @@ package ru.otus.onlineSchool.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,15 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.UserRepository;
+
+import javax.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -27,12 +24,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-@ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 class UserRestControllerTest {
     @TestConfiguration
     static class UserRestControllerTestContextConfiguration {
@@ -50,6 +43,7 @@ class UserRestControllerTest {
     private UserRepository userRepository;
 
     @Test
+    @Transactional
     void createUserSuccess() throws Exception {
         User user = new User();
         user.setLogin("Test login");
@@ -99,11 +93,12 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$.[?(@.id == 115 && @.login == 'teacher')]").exists())
-                .andExpect(jsonPath("$.[?(@.id == 116 && @.login == 'student')]").exists())
+                .andExpect(jsonPath("$.[?(@.id == 116)]").exists())
                 .andExpect(jsonPath("$.[?(@.id == 117 && @.login == 'admin')]").exists());
     }
 
     @Test
+    @Transactional
     void deleteUserSuccess() throws Exception {
         long userId = 116;
 
@@ -166,15 +161,7 @@ class UserRestControllerTest {
         String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
         long userId = 117;
 
-        // Проверим, что было в начале
-        User user = userRepository.findById(userId).orElse(null);
-        assertThat(user).isNotNull();
-        assertThat(user.getLogin()).isEqualTo("admin");
-
-        // Удалим пользователь
-        userRepository.deleteById(userId);
-
-        // Обновляем, сохраняем
+        User user = new User();
         user.setLogin("Updated Login");
         user.setRoles(null);
 
@@ -190,12 +177,12 @@ class UserRestControllerTest {
 
     @Test
     public void getUserSuccess() throws Exception {
-        mvc.perform(get("/api/users/116"))
+        mvc.perform(get("/api/users/117"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.id").value(116))
-                .andExpect(jsonPath("$.login").value("student"));
+                .andExpect(jsonPath("$.id").value(117))
+                .andExpect(jsonPath("$.login").value("admin"));
     }
 
     @Test

@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    private long id;
     @Column(name = "title")
     private String title;
     @Column(name = "description")
@@ -50,11 +50,11 @@ public class Lesson {
         this.description = description;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

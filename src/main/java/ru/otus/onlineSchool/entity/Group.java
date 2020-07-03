@@ -16,7 +16,7 @@ public class Group implements Serializable {
     @Id
     @Column(name = "group_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    private long id;
     @Column(name = "title", unique = true)
     private String title;
     @ManyToMany(fetch = FetchType.LAZY)
@@ -64,11 +64,11 @@ public class Group implements Serializable {
         this.course = course;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 

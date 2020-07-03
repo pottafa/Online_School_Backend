@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
+import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.service.CourseService;
 
@@ -35,9 +36,8 @@ public class CourseRestController {
     }
 
     @GetMapping("/api/courses")
-    public ResponseEntity<List<Course>> getAllCourses() {
-        List<Course> courses = courseService.findAllCourses();
-        return ResponseEntity.ok(courses);
+    public ResponseEntity<List<CourseMenuItemDTO>> getAllCourses() {
+        return ResponseEntity.ok(courseService.findAllCourses());
     }
 
     @DeleteMapping("/api/courses/{id}")

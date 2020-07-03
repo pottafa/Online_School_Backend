@@ -34,12 +34,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-@ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 class GroupRestControllerTest {
     @TestConfiguration
     static class GroupRestControllerTestContextConfiguration {
@@ -60,6 +56,7 @@ class GroupRestControllerTest {
     private MockMvc mvc;
 
     @Test
+    @Transactional
     void createGroupSuccess() throws Exception {
         long courseId = 103;
         Course courseFromDb = courseRepository.findById(courseId).orElse(null);
@@ -121,6 +118,7 @@ class GroupRestControllerTest {
     }
 
     @Test
+    @Transactional
     void deleteGroupSuccess() throws Exception {
         long courseId = 103;
         long groupId = 114;
@@ -189,16 +187,9 @@ class GroupRestControllerTest {
         String expectedResult = new ObjectMapper().writeValueAsString(apiError);
 
         long courseId = 103;
-        long groupId = 114;
+        long groupId = 1111;
 
-        Group group = groupRepository.findById(groupId).orElse(null);
-        assertThat(group).isNotNull();
-        assertThat(group.getTitle()).isEqualTo("First group");
-
-        // Удалим группу
-        groupRepository.deleteById(groupId);
-
-        // Обновляем, сохраняем
+        Group group = new Group();
         group.setTitle("First group Updated Title");
         group.setUsers(null);
 
@@ -238,6 +229,7 @@ class GroupRestControllerTest {
     }
 
     @Test
+    @Transactional
     void addUsersToTheGroupSuccess() throws Exception {
 
         int courseId = 103;

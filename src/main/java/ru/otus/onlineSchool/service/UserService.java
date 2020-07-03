@@ -5,11 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import ru.otus.onlineSchool.dto.UserMenuItemDTO;
 import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.repository.UserRepository;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,36 +30,28 @@ public class UserService {
     }
 
     public Long createUser(User user) {
-        User userFromDB = userRepository.findById(user.getId()).orElse(null);
-        if (userFromDB != null) return null;
-        LOGGER.error("Failed create user. User with id {} already exist", user.getId());
-        Long id = null;
+        if (userRepository.existsById(user.getId())) {
+            LOGGER.error("Failed create user. User with id {} already exist", user.getId());
+            return null;
+        }
         try {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            id = userRepository.save(user).getId();
+            Long id = userRepository.save(user).getId();
             LOGGER.info("User with id {} was successfully created", id);
+            return id;
         } catch (Exception e) {
             LOGGER.error("User was not created", e);
         }
-        return id;
+        return null;
     }
 
-    public List<User> findAllUsers() {
-        List<User> users = new ArrayList<>();
-        userRepository.findAllUserMenuDTOBy().forEach(userDTO -> {
-            User user = new User();
-            user.setId(userDTO.getId());
-            user.setLogin(userDTO.getLogin());
-            users.add(user);
-        });
-        return users;
+    public List<UserMenuItemDTO> findAllUsers() {
+       return userRepository.findAllUserMenuDTOBy();
     }
 
     public String findUserEmail(Long userId) {
         return userRepository.findUserEmail(userId);
     }
-
-
 
     public boolean deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {

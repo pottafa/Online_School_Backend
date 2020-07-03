@@ -2,7 +2,6 @@ package ru.otus.onlineSchool.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,28 +11,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Lesson;
 import ru.otus.onlineSchool.repository.CourseRepository;
 import ru.otus.onlineSchool.repository.LessonRepository;
 
+import javax.transaction.Transactional;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-@ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 class LessonRestControllerTest {
     @TestConfiguration
     static class LessonRestControllerTestContextConfiguration {
@@ -54,6 +48,7 @@ class LessonRestControllerTest {
     private MockMvc mvc;
 
     @Test
+    @Transactional
     void createLessonSuccess() throws Exception {
         Long courseId = 103L;
         Course courseFromDb = courseRepository.findById(courseId).orElse(null);
@@ -115,6 +110,7 @@ class LessonRestControllerTest {
     }
 
     @Test
+    @Transactional
     void deleteLessonSuccess() throws Exception {
         long courseId = 103;
         long lessonId = 107;
@@ -154,7 +150,6 @@ class LessonRestControllerTest {
         long courseId = 103;
         long lessonId = 107;
 
-
         Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
         assertThat(lesson).isNotNull();
         assertThat(lesson.getTitle()).isEqualTo("Введение");
@@ -182,17 +177,10 @@ class LessonRestControllerTest {
         String expectedResult = new ObjectMapper().writeValueAsString(apiError);
 
         long courseId = 103;
-        long lessonId = 107;
+        long lessonId = 1111;
 
-        Lesson lesson = lessonRepository.findById(lessonId).orElse(null);
-        assertThat(lesson).isNotNull();
-        assertThat(lesson.getTitle()).isEqualTo("Введение");
-
-        // Удалим группу
-        lessonRepository.deleteById(lessonId);
-
-        // Обновляем, сохраняем
-        lesson.setTitle("Введение Updated Title");
+        Lesson lesson = new Lesson();
+        lesson.setTitle("Updated Title");
 
         String lessonJson = new ObjectMapper().writeValueAsString(lesson);
 

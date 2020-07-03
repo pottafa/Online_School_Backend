@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.entity.User;
 import ru.otus.onlineSchool.service.UserService;
-import java.util.List;
-
 
 @RestController
 public class UserRestController {
@@ -33,8 +31,7 @@ public class UserRestController {
 
     @GetMapping("/api/users")
     public ResponseEntity<?> getUsers() {
-        List<User> users = userService.findAllUsers();
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(userService.findAllUsers());
     }
 
     @DeleteMapping("/api/users/{id}")
