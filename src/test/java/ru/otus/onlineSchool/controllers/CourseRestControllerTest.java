@@ -2,7 +2,6 @@ package ru.otus.onlineSchool.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,14 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.repository.CourseRepository;
+
+import javax.transaction.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -26,12 +24,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-@ActiveProfiles("test")
-@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 class CourseRestControllerTest {
     @TestConfiguration
     static class CourseRestControllerTestContextConfiguration {
@@ -104,6 +98,7 @@ class CourseRestControllerTest {
     }
 
     @Test
+    @Transactional
     void deleteCourseSuccess() throws Exception {
         long courseId = 103;
 
@@ -137,17 +132,16 @@ class CourseRestControllerTest {
 
     @Test
     void updateCourseSuccess() throws Exception {
-        long courseId = 103;
+        long courseId = 104;
 
         // Проверим, что было в начале
         Course course = courseRepository.findById(courseId).orElse(null);
         assertThat(course).isNotNull();
-        assertThat(course.getTitle()).isEqualTo("Java SE");
-        assertThat(course.getDescription()).isEqualTo("Курс по Java SE");
+        assertThat(course.getTitle()).isEqualTo("Spring");
+        assertThat(course.getDescription()).isEqualTo("Курс по Spring Framework");
 
         // Обновляем, сохраняем
-        course.setTitle("Java SE Updated Title");
-        course.setDescription("Курс по Java SE Updated Description");
+        course.setDescription("Курс по Spring Framework Updated Description");
 
         String courseJson = new ObjectMapper().writeValueAsString(course);
         mvc.perform(put("/api/courses/" + courseId)
@@ -159,28 +153,24 @@ class CourseRestControllerTest {
         // Проверяем, что сохранилось
         Course updatedCourse = courseRepository.findById(courseId).orElse(null);
         assertThat(updatedCourse).isNotNull();
-        assertThat(course.getTitle()).isEqualTo("Java SE Updated Title");
-        assertThat(course.getDescription()).isEqualTo("Курс по Java SE Updated Description");
+        assertThat(course.getDescription()).isEqualTo("Курс по Spring Framework Updated Description");
     }
 
     @Test
     void updateCourseErrorMessage() throws Exception {
         ApiError apiError = new ApiError("Failed update course");
         String expectedResponse = new ObjectMapper().writeValueAsString(apiError);
-        long courseId = 103;
+        long courseId = 104;
 
         // Проверим, что было в начале
         Course course = courseRepository.findById(courseId).orElse(null);
         assertThat(course).isNotNull();
-        assertThat(course.getTitle()).isEqualTo("Java SE");
-        assertThat(course.getDescription()).isEqualTo("Курс по Java SE");
 
         // Удалим курс
         courseRepository.deleteById(courseId);
 
         // Обновляем, сохраняем
         course.setTitle("Updated Title");
-        course.setDescription("Updated Description");
 
         String courseJson = new ObjectMapper().writeValueAsString(course);
 

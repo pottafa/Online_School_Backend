@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.otus.onlineSchool.dto.GroupMenuItemDTO;
 import ru.otus.onlineSchool.entity.*;
 import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.repository.CourseRepository;
@@ -11,7 +12,6 @@ import ru.otus.onlineSchool.repository.GroupRepository;
 import ru.otus.onlineSchool.repository.UserRepository;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -27,15 +27,8 @@ public class GroupService {
     @Autowired
     private GroupRepository groupRepository;
 
-    public List<Group> findGroupByCourse(Long courseId) {
-        List<Group> groups = new ArrayList<>();
-        groupRepository.findByCourse_Id(courseId).forEach(groupDTO -> {
-            Group group = new Group();
-            group.setId(groupDTO.getId());
-            group.setTitle(groupDTO.getTitle());
-            groups.add(group);
-        });
-        return groups;
+    public List<GroupMenuItemDTO> findGroupByCourse(Long courseId) {
+     return groupRepository.findByCourse_Id(courseId);
     }
 
     public Group findGroupById(long groupId) {
@@ -43,16 +36,20 @@ public class GroupService {
     }
 
     @Transactional
-    public Long createGroup(Long courseId, Group groupFromDb) {
+    public Long createGroup(Long courseId, Group group) {
         Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null) {
-            LOGGER.error("Failed create groupFromDb. Course with id {} not exist", courseId);
+            LOGGER.error("Failed create group. Course with id {} does not exist", courseId);
             return null;
         }
-        groupFromDb.setCourse(course);
-        Long groupFromDbId = groupRepository.save(groupFromDb).getId();
-        LOGGER.info("Group with id {} was successfully created", groupFromDbId);
-        return groupFromDbId;
+        if (groupRepository.existsById(group.getId())) {
+            LOGGER.error("Failed create group. Group with id {} already exist", group.getId());
+            return null;
+        }
+        group.setCourse(course);
+        Long createdGroupId = groupRepository.save(group).getId();
+        LOGGER.info("Group with id {} was successfully created", createdGroupId);
+        return createdGroupId;
     }
 
 
@@ -72,7 +69,7 @@ public class GroupService {
     public Group updateGroup(Long groupId, Group group) {
         Group groupFromDB = groupRepository.findById(groupId).orElse(null);
         if (groupFromDB == null) {
-            LOGGER.error("Failed update group. Group does not exist");
+            LOGGER.error("Failed update group. Group with id {} does not exist", groupId);
             return null;
         }
         groupFromDB.setTitle(group.getTitle());

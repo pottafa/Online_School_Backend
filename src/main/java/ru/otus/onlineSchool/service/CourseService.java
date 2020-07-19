@@ -4,13 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.otus.onlineSchool.dto.CourseMenuItemDTO;
 import ru.otus.onlineSchool.dto.CourseStatisticsView;
 import ru.otus.onlineSchool.dto.CourseView;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.repository.CourseRepository;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,9 +22,8 @@ public class CourseService {
 
 
     public Long createCourse(Course course) {
-        Course courseFromDB = courseRepository.findById(course.getId()).orElse(null);
-        if (courseFromDB != null) {
-            LOGGER.error("Course already exist");
+        if (courseRepository.existsById(course.getId())) {
+            LOGGER.error("Failed create course. Course with id {} already exist", course.getId());
             return null;
         }
         try {
@@ -37,15 +36,8 @@ public class CourseService {
         return null;
     }
 
-    public List<Course> findAllCourses() {
-        List<Course> courses = new ArrayList<>();
-        courseRepository.findAllCoursesMenuDTOBy().forEach(courseDTO -> {
-            Course course = new Course();
-            course.setId(courseDTO.getId());
-            course.setTitle(courseDTO.getTitle());
-            courses.add(course);
-        });
-        return courses;
+    public List<CourseMenuItemDTO> findAllCourses() {
+        return courseRepository.findAllCoursesMenuDTOBy();
     }
 
     public Course findCourseById(long courseId) {
@@ -60,7 +52,7 @@ public class CourseService {
 
     public boolean deleteCourse(Long courseId) {
         if (!courseRepository.existsById(courseId)) {
-            LOGGER.info("Course with id {} is already exist and cannot be deleted ", courseId);
+            LOGGER.info("Course with id {} does not exist and cannot be deleted ", courseId);
             return false;
         }
         courseRepository.deleteById(courseId);

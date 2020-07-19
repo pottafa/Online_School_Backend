@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.otus.onlineSchool.controllers.rest.message.ApiError;
+import ru.otus.onlineSchool.dto.GroupMenuItemDTO;
 import ru.otus.onlineSchool.entity.Group;
 import ru.otus.onlineSchool.service.GroupService;
 
@@ -25,13 +26,9 @@ public class GroupRestController {
     }
 
     @GetMapping("/api/courses/{courseId}/groups")
-    public ResponseEntity<?> getGroups(@PathVariable("courseId") long courseId) {
-        List<Group> groups = groupService.findGroupByCourse(courseId);
-        if (groups != null) {
-            return ResponseEntity.ok(groups);
-        } else {
-            return ResponseEntity.ok(new ApiError("Failed get groups"));
-        }
+    public ResponseEntity<List<GroupMenuItemDTO>> getGroups(@PathVariable("courseId") long courseId) {
+        List<GroupMenuItemDTO> groups = groupService.findGroupByCourse(courseId);
+        return ResponseEntity.ok(groups);
     }
 
 

@@ -4,13 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.otus.onlineSchool.dto.LessonMenuItemDTO;
 import ru.otus.onlineSchool.entity.Course;
 import ru.otus.onlineSchool.entity.Lesson;
 import ru.otus.onlineSchool.repository.CourseRepository;
 import ru.otus.onlineSchool.repository.LessonRepository;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,15 +23,9 @@ public class LessonService {
     private LessonRepository lessonRepository;
 
 
-    public List<Lesson> findLessonByCourse(Long courseId) {
-        List<Lesson> lessons = new ArrayList<>();
-        lessonRepository.findByCourse_Id(courseId).forEach(lessonDTO -> {
-            Lesson lesson = new Lesson();
-            lesson.setId(lessonDTO.getId());
-            lesson.setTitle(lessonDTO.getTitle());
-            lessons.add(lesson);
-        });
-        return lessons;
+    public List<LessonMenuItemDTO> findLessonByCourse(Long courseId) {
+      return lessonRepository.findByCourse_Id(courseId);
+
     }
 
     public Lesson findLessonById(long lessonId) {
@@ -42,7 +36,11 @@ public class LessonService {
     public Long createLesson(Long courseId, Lesson lesson) {
         Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null) {
-            LOGGER.error("Failed create lessonFromDb. Course with id {} not exist", courseId);
+            LOGGER.error("Failed create lesson. Course with id {} not exist", courseId);
+            return null;
+        }
+        if (lessonRepository.existsById(lesson.getId())) {
+            LOGGER.error("Failed create lesson. Lesson with id {} already exist", lesson.getId());
             return null;
         }
         lesson.setCourse(course);
